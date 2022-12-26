@@ -1,0 +1,6 @@
+#+title: Optimization design library
+
+This repo shall support user in:
+- building optimization problems using the casadi library
+- Testing initial guess and constraints for the designed library
+- Exporting the optimizaiton problem to Casadi-independent CPP code.
