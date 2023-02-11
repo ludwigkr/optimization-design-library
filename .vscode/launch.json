@@ -21,6 +21,15 @@
             "cwd": "${workspaceFolder}/min_nlp",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "min_nlp_with_params",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/min_nlp_with_params/ocp_min_nlp_with_params.py",
+            "cwd": "${workspaceFolder}/min_nlp_with_params",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

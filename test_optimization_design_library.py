@@ -1,12 +1,17 @@
+import sys
 import unittest
 import casadi
 import numpy as np
 
+sys.path.append('./min_nlp_with_params')
 from optimizationproblem import OptimizationProblem
 
 from variables import Variables
 from function import Function
 from constraints import Constraints
+from ocp_min_nlp_with_params import optimization_problem_min_nlp_with_params
+
+from problembuildhelper import ProblemBuildHelper
 
 class TestOptimizationProblem(unittest.TestCase):
 
@@ -163,6 +168,34 @@ class TestOptimizationProblem(unittest.TestCase):
         fn.build('fn', self.ocp.problem_parameter, self.ocp.scenario_parameter, np.array([[1], [2]]))
         # res = fn()
         # print(res)
+
+class TestProblemBuildHelper(unittest.TestCase):
+    def setUp(self):
+        self.var = Variables()
+        X = casadi.SX.sym("X", 2, 1)
+        Y = casadi.SX.sym("X", 2, 1)
+        self.var.register("X", X)
+        self.var.register("Y", Y)
+        self.problem_build_helper = ProblemBuildHelper()
+        self.op = optimization_problem_min_nlp_with_params()
+
+    def test_variable_structure(self):
+        output = self.problem_build_helper.variable_structure_definition("problem_parameter", self.var)
+        target_output = \
+"""struct problem_parameter{
+    Eigen::VectorXd X;
+    Eigen::VectorXd Y;
+
+    problem_parameter(Eigen::VectorXd _X, Eigen::VectorXd _Y):
+        X(_X),
+        Y(_Y){}
+
+};"""
+        self.assertTrue(target_output == output)
+
+    def test_initH(self):
+        pass
+
 
 if __name__ == '__main__':
     unittest.main()

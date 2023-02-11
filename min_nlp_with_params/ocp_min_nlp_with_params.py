@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import numpy as np
-import casadi
-from casadi import SX, DM
+from casadi import SX
 
 sys.path.append("../")
 sys.path.append("../optimization_design_library")
@@ -13,7 +11,7 @@ sys.path.append("../min_nlp")
 
 from optimizationproblem import OptimizationProblem
 import optimizationsolver
-from helper import *
+from build_cpp import CppBuilder
 from ocp_min_nlp import optimization_problem_min_nlp
 
 from optimizationconfiguration import load_optimizer_settings
@@ -56,3 +54,6 @@ if __name__ == "__main__":
 
     # problem_parameters = ocp.problem_parameter.unpacked()
     optimizationsolver.write_formulation(ocp, scenario, problem_parameters, result)
+
+    cppbuilder = CppBuilder()
+    cppbuilder.build(ocp)

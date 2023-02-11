@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-
-
-import os
-import sys
 import casadi
-
-local_folder_path = os.path.dirname(__file__)
-sys.path.append(local_folder_path + "../")
 from optimizationproblem import OptimizationProblem
 
 class QuadraticOptimizerElements:
