@@ -68,10 +68,9 @@ class ProblemBuildHelper:
     def build_matrix_values(self, name, vals: [str])->str:
         ret = ''
         temp_name = name + self.temporary
-        for val in vals:
-            [sidxs, entry] = val.split('->')
-            sidxs = sidxs.replace('(', '[').replace(')',']')
-            lhs = name + sidxs
+        for v, val in enumerate(vals):
+            entry = val.split('->')[1]
+            lhs = name + '[' + str(v) +']'
             rhs = entry.replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
