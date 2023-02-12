@@ -12,7 +12,7 @@ sys.path.append("../optimization_design_library")
 
 from optimizationproblem import OptimizationProblem
 import optimizationsolver
-
+from build_cpp import CppBuilder
 from optimizationconfiguration import load_optimizer_settings
 
 def optimization_problem_min_nlp():
@@ -72,3 +72,6 @@ if __name__ == "__main__":
 
     problem_parameters = ocp.problem_parameter.unpacked()
     optimizationsolver.write_formulation(ocp, scenario, problem_parameters, result)
+
+    cppbuilder = CppBuilder()
+    cppbuilder.build(ocp)

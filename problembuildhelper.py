@@ -79,18 +79,16 @@ class ProblemBuildHelper:
     def build_vector_values(self, name, vals: [str]) -> str:
         ret = ''
         temp_name = name + self.temporary
-        for i, val in enumerate(vals):
-            [sidxs, entry] = val.split('->')
-            sidxs = sidxs.replace('(', '').replace(')','')
-            sidxs = sidxs.split(',')[1]
-            sidxs = "[" + sidxs + "]"
-            lhs = name + sidxs
+        for v, val in enumerate(vals):
+            entry = val.split('->')[1]
+            lhs = name + '[' + str(v) +']'
             rhs = entry.replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
         return ret
 
     def build_dense_matrix(self, name: str, mat: casadi.SX):
+        mat = casadi.SX(mat)
         smat = self.SX_sparse_str(mat)
         print(smat)
         definitions = [e.replace(',', '') for e in smat if e[0] == '@']

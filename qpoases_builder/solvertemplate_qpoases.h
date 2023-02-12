@@ -21,17 +21,17 @@ class SolverTemplate : public QuadraticOptimizer {
     QPSettings qp_setup() {
         return QPSettings(solver.getOptions());
     };
-    Eigen::VectorXd constraints(problem_parameters* prob_params, problem_solution* prev_qpsolution);
+    Eigen::VectorXd constraints(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
     Eigen::VectorXd constraints(Eigen::VectorXd xopt, Eigen::VectorXd param);
-    Eigen::MatrixXd constraint_derivative(problem_parameters* prob_params, problem_solution* prev_qpsolution);
-    Eigen::VectorXd initial_guess(problem_parameters* prob_params, scenario_parameter* scenerio);
-    Eigen::VectorXd parameters(problem_parameters* prob_params);
-    Eigen::VectorXd lbx(problem_parameters* prob_params, scenario_parameter* scenerio);
-    Eigen::VectorXd ubx(problem_parameters* prob_params, scenario_parameter* scenerio);
-    Eigen::VectorXd lbg(problem_parameters* prob_params, scenario_parameter* scenerio);
-    Eigen::VectorXd ubg(problem_parameters* prob_params, scenario_parameter* scenerio);
-    problem_solution solve(problem_parameters* prob_params, bool init, double cpu_time);
-    problem_solution solve(problem_parameters* prob_params, problem_solution* prev_qpsolution, bool init, double cpu_time);
+    Eigen::MatrixXd constraint_derivative(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
+    Eigen::VectorXd initial_guess(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
+    Eigen::VectorXd parameters(quadratic_problem_values* quad_prob_values);
+    Eigen::VectorXd lbx(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
+    Eigen::VectorXd ubx(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
+    Eigen::VectorXd lbg(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
+    Eigen::VectorXd ubg(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
+    problem_solution solve(quadratic_problem_values* quad_prob_values, bool init, double cpu_time);
+    problem_solution solve(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution, bool init, double cpu_time);
     std::string status_return_name(int status);
     // std::vector<Eigen::VectorXd> trajectory(Eigen::VectorXd xopt, trajectory_type traj_type);
 
@@ -53,13 +53,13 @@ class SolverTemplate : public QuadraticOptimizer {
     SQProblem solver;
     double* _cpu_time;
 
-    void update_vectors_bx(problem_parameters* prob_params, problem_solution* prev_qpsolution);
+    void update_vectors_bx(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
     void copy_xopt();
-    void update_matrix_H(problem_parameters* prob_params, problem_solution* prev_qpsolution);
+    void update_matrix_H(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
 
-    void update_vector_g(problem_parameters* prob_params, problem_solution* prev_qpsolution);
-    void update_matrix_A(problem_parameters* prob_params, problem_solution* prev_qpsolution);
-    void update_vectors_bA(problem_parameters* prob_params, problem_solution* prev_qpsolution);
+    void update_vector_g(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
+    void update_matrix_A(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
+    void update_vectors_bA(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
 
     double sq(double x) {
         return x * x;
