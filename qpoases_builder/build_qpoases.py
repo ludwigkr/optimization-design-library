@@ -74,38 +74,22 @@ class QpoasesBuilder:
         source = source.replace("    /* CONSTRAINT_DERIVATIVES PLACEHOLDER*/", dconstr)
 
         parameters = self.build_parameters(op, op.problem_parameter.variables_flat())
-        # parameters = build_scenario_dependent_vector("parameters",
-        # optimizer_text_elements["problem_parameter"],
-        # optimizer_text_elements["scenario_parameter"],
-        # optimizer_text_elements["parameter_builder_fn"])
         source = source.replace("    /* PARAMS PLACEHOLDER*/", parameters)
 
         initial_guess = self.build_initial_guess(op, op.fn_initial_guess.call())
         source = source.replace("    /* INITIAL_GUESS PLACEHOLDER*/", initial_guess)
 
-        # lbx = build_scenario_dependent_vector("lbx",
-        # optimizer_text_elements["problem_parameter"],
-        # optimizer_text_elements["scenario_parameter"],
-        # optimizer_text_elements["lbx"])
-        # source = source.replace("    /* LBX PLACEHOLDER*/", lbx)
+        lbx = self.build_lbx(op, op.fn_lbx.call())
+        source = source.replace("    /* LBX PLACEHOLDER*/", lbx)
 
-        # ubx = build_scenario_dependent_vector("ubx",
-        # optimizer_text_elements["problem_parameter"],
-        # optimizer_text_elements["scenario_parameter"],
-        # optimizer_text_elements["ubx"])
-        # source = source.replace("    /* UBX PLACEHOLDER*/", ubx)
+        ubx = self.build_ubx(op, op.fn_ubx.call())
+        source = source.replace("    /* UBX PLACEHOLDER*/", ubx)
 
-        # lbg = build_scenario_dependent_vector("lbg",
-        # optimizer_text_elements["problem_parameter"],
-        # optimizer_text_elements["scenario_parameter"],
-        # optimizer_text_elements["lbg"])
-        # source = source.replace("    /* LBG PLACEHOLDER*/", lbg)
+        lbg = self.build_lbg(op, op.fn_lbg.call())
+        source = source.replace("    /* LBG PLACEHOLDER*/", lbg)
 
-        # ubg = build_scenario_dependent_vector("ubg",
-        # optimizer_text_elements["problem_parameter"],
-        # optimizer_text_elements["scenario_parameter"],
-        # optimizer_text_elements["ubg"])
-        # source = source.replace("    /* UBG PLACEHOLDER*/", ubg)
+        ubg = self.build_ubg(op, op.fn_ubg.call())
+        source = source.replace("    /* UBG PLACEHOLDER*/", ubg)
 
         file_name = op.name + "_quad_opti_qpoases.cpp"
         print(file_name)
@@ -115,8 +99,8 @@ class QpoasesBuilder:
     def subsitude_variables(self, exp: str, op: OptimizationProblem) -> str:
         ret = self.problem_build_helper.substitude_variable(exp, 'X', 'xopt', op.optvars.n_vars)
         ret = self.problem_build_helper.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
-        ret = self.problem_build_helper.substitute_variable(ret, 'prob_params', '->', op.problem_parameter)
         ret = self.problem_build_helper.substitute_variable(ret, 'scenario', '->', op.scenario_parameter)
+        ret = self.problem_build_helper.sustitute_parameters(ret, 'param', op.problem_parameter)
         return ret
 
 
@@ -149,7 +133,6 @@ class QpoasesBuilder:
         ret = self.subsitude_variables(ret, op)
         return ret
 
-
     def build_constraint_derivatives(self, op: OptimizationProblem, dconstr: casadi.SX) -> str:
         ret = self.problem_build_helper.build_dense_matrix('dconstraints', dconstr)
         ret = self.subsitude_variables(ret, op)
@@ -162,5 +145,25 @@ class QpoasesBuilder:
 
     def build_initial_guess(self, op: OptimizationProblem, initial_guess: casadi.SX):
         ret = self.problem_build_helper.build_dense_matrix('initial_guess', initial_guess)
+        ret = self.subsitude_variables(ret, op)
+        return ret
+
+    def build_lbx(self, op: OptimizationProblem, lbx: casadi.SX):
+        ret = self.problem_build_helper.build_dense_matrix('lbx', lbx)
+        ret = self.subsitude_variables(ret, op)
+        return ret
+
+    def build_ubx(self, op: OptimizationProblem, ubx: casadi.SX):
+        ret = self.problem_build_helper.build_dense_matrix('ubx', ubx)
+        ret = self.subsitude_variables(ret, op)
+        return ret
+
+    def build_lbg(self, op: OptimizationProblem, lbg: casadi.SX):
+        ret = self.problem_build_helper.build_dense_matrix('lbg', lbg)
+        ret = self.subsitude_variables(ret, op)
+        return ret
+
+    def build_ubg(self, op: OptimizationProblem, ubg: casadi.SX):
+        ret = self.problem_build_helper.build_dense_matrix('ubg', ubg)
         ret = self.subsitude_variables(ret, op)
         return ret

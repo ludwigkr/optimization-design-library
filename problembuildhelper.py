@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import casadi
+import numpy as np
 
 from variables import Variables
 from optimizationproblem import OptimizationProblem
@@ -125,5 +126,16 @@ class ProblemBuildHelper:
                     search_pattern = var + "_" + str(n)
                     replace_pattern = name + link_symbol + var + "[" + str(n) + "]"
                     exp = exp.replace(search_pattern, replace_pattern)
+
+        return exp
+
+    def sustitute_parameters(self, exp: str, name: str, params: Variables) -> str:
+        for p, param_name in enumerate(params.names):
+            pidxs = params.idxs[param_name]
+            N = np.size(pidxs)
+            for n in reversed(range(N)):
+                search_pattern = param_name + '_' + str(n)
+                replace_pattern = name  + str(pidxs[n])
+                exp = exp.replace(search_pattern, replace_pattern)
 
         return exp
