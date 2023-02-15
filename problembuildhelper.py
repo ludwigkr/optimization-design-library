@@ -32,7 +32,9 @@ class ProblemBuildHelper:
                 variable_structure += "float _" + var.names[vi] + ", "
             else:
                 variable_structure += "Eigen::VectorXd _" + var.names[vi] + ", "
-        variable_structure = variable_structure[:-2]
+
+        if variable_structure[-2:] == ', ':
+            variable_structure = variable_structure[:-2]
 
         variable_structure += "):\n"
         for vi, v in enumerate(var.variables):
