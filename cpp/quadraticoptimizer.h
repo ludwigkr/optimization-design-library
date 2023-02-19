@@ -76,6 +76,7 @@ enum trajectory_type {
 };
 
 struct scenario_parameter;
+struct problem_parameter;
 
 class QuadraticOptimizer {
 public:
@@ -83,15 +84,17 @@ public:
     virtual Eigen::VectorXd constraints(quadratic_problem_values *quad_prob_valuess, problem_solution *prev_qpsolution) = 0;
     virtual Eigen::VectorXd constraints(Eigen::VectorXd xopt, Eigen::VectorXd param) = 0;
     virtual Eigen::MatrixXd constraint_derivative(quadratic_problem_values *quad_prob_valuess, problem_solution *prev_qpsolution) = 0;
-    virtual Eigen::VectorXd initial_guess(scenario_parameter *scenario) = 0;
-    virtual Eigen::VectorXd ubx(scenario_parameter *scenario) = 0;
-    virtual Eigen::VectorXd lbx(scenario_parameter *scenario) = 0;
-    virtual Eigen::VectorXd ubg(scenario_parameter *scenario) = 0;
-    virtual Eigen::VectorXd lbg(scenario_parameter *scenario) = 0;
     virtual problem_solution solve(quadratic_problem_values *quad_prob_valuess, bool init, double cpu_time) = 0;
     virtual problem_solution solve(quadratic_problem_values *quad_prob_valuess, problem_solution *prev_qpsolution, bool init, double cpu_time) = 0;
     virtual std::string status_return_name(int status) = 0;
     virtual std::string quadratic_solver_library() = 0;
+
+    virtual Eigen::VectorXd initial_guess(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd parameters(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd ubx(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd lbx(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd ubg(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd lbg(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
 
     double costs(Eigen::VectorXd X) {
         auto ret = 0.5 * X.transpose() * _H * X + X.transpose() * _g;
