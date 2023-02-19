@@ -44,6 +44,7 @@ class ProblemBuildHelper:
         variable_structure += "{}\n\n"
 
         variable_structure += "};"
+        print(variable_structure)
         return variable_structure
 
     def SX_sparse_str(self, mat: casadi.SX) -> str:
@@ -65,7 +66,7 @@ class ProblemBuildHelper:
         for i, _def in enumerate(defs):
             value = _def.split('=')[-1]
             value.replace('@', var_name)
-            ret += 'float ' + var_name + str(i+1) + " = " + value + ";\n"
+            ret += 'double ' + var_name + str(i+1) + " = " + value + ";\n"
         return ret
 
     def build_matrix_values(self, name, vals: [str])->str:

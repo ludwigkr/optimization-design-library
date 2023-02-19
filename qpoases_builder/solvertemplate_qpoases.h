@@ -24,15 +24,16 @@ class SolverTemplate : public QuadraticOptimizer {
     Eigen::VectorXd constraints(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
     Eigen::VectorXd constraints(Eigen::VectorXd xopt, Eigen::VectorXd param);
     Eigen::MatrixXd constraint_derivative(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution);
-    Eigen::VectorXd initial_guess(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
-    Eigen::VectorXd parameters(quadratic_problem_values* quad_prob_values);
-    Eigen::VectorXd lbx(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
-    Eigen::VectorXd ubx(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
-    Eigen::VectorXd lbg(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
-    Eigen::VectorXd ubg(quadratic_problem_values* quad_prob_values, scenario_parameter* scenerio);
     problem_solution solve(quadratic_problem_values* quad_prob_values, bool init, double cpu_time);
     problem_solution solve(quadratic_problem_values* quad_prob_values, problem_solution* prev_qpsolution, bool init, double cpu_time);
     std::string status_return_name(int status);
+
+    Eigen::VectorXd initial_guess(problem_parameter* prob_param, scenario_parameter* scenerio);
+    Eigen::VectorXd parameters(problem_parameter* prob_param, scenario_parameter* scenerio);
+    Eigen::VectorXd lbx(problem_parameter* prob_param, scenario_parameter* scenario);
+    Eigen::VectorXd ubx(problem_parameter* prob_param, scenario_parameter* scenario);
+    Eigen::VectorXd lbg(problem_parameter* prob_param, scenario_parameter* scenario);
+    Eigen::VectorXd ubg(problem_parameter* prob_param, scenario_parameter* scenario);
     // std::vector<Eigen::VectorXd> trajectory(Eigen::VectorXd xopt, trajectory_type traj_type);
 
     double costs(Eigen::VectorXd X);

@@ -52,6 +52,7 @@ class QpoasesBuilder:
         source = source.replace("N_XOPTS + N_CONSTRAINTS", str(n_xopts + n_constraints))
         source = source.replace("N_XOPTS", str(n_xopts))
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
+        source = source.replace("N_PARAMS", str(op.problem_parameter.n_vars))
 
         init_H = self.build_H(op, qoe.objective_hessian)
         source = source.replace("    /* INIT H PLACEHOLDER*/", init_H)

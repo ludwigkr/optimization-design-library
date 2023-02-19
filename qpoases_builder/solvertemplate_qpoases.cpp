@@ -197,37 +197,37 @@ Eigen::MatrixXd SolverTemplate::constraint_derivative(quadratic_problem_values* 
     return dconstraints;
 }
 
-Eigen::VectorXd SolverTemplate::initial_guess(quadratic_problem_values* quad_prob_values [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+Eigen::VectorXd SolverTemplate::initial_guess(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
     Eigen::VectorXd initial_guess = Eigen::VectorXd(N_XOPTS).setZero();
     /* INITIAL_GUESS PLACEHOLDER*/
     return initial_guess;
 }
 
-Eigen::VectorXd SolverTemplate::parameters(quadratic_problem_values* quad_prob_values) {
-    Eigen::VectorXd parameters = Eigen::VectorXd(N_PARAMS).setZeros();
+Eigen::VectorXd SolverTemplate::parameters(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+    Eigen::VectorXd parameters = Eigen::VectorXd(N_PARAMS).setZero();
     /* PARAMS PLACEHOLDER*/
     return parameters;
 }
 
-Eigen::VectorXd SolverTemplate::lbx(quadratic_problem_values* quad_prob_values [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+Eigen::VectorXd SolverTemplate::lbx(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
     Eigen::VectorXd lbx = Eigen::VectorXd(N_XOPTS).setZero();
     /* LBX PLACEHOLDER*/
     return lbx;
 }
 
-Eigen::VectorXd SolverTemplate::ubx(quadratic_problem_values* quad_prob_values [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+Eigen::VectorXd SolverTemplate::ubx(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
     Eigen::VectorXd ubx = Eigen::VectorXd(N_XOPTS).setZero();
     /* UBX PLACEHOLDER*/
     return ubx;
 }
 
-Eigen::VectorXd SolverTemplate::lbg(quadratic_problem_values* quad_prob_values [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+Eigen::VectorXd SolverTemplate::lbg(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
     Eigen::VectorXd lbg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
     /* LBG PLACEHOLDER*/
     return lbg;
 }
 
-Eigen::VectorXd SolverTemplate::ubg(quadratic_problem_values* quad_prob_values [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
+Eigen::VectorXd SolverTemplate::ubg(problem_parameter* prob_param [[maybe_unused]], scenario_parameter* scenario [[maybe_unused]]) {
     Eigen::VectorXd ubg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
     /* UBG PLACEHOLDER*/
     return ubg;
@@ -275,7 +275,7 @@ void SolverTemplate::update_vectors_bx(quadratic_problem_values* quad_prob_value
 }
 
 problem_solution SolverTemplate::solve(quadratic_problem_values* quad_prob_values, bool init, double cpu_time) {
-    problem_solution prev_qpsolution(quad_prob_values, constraints(prob_params->X0, prob_params->param));
+    problem_solution prev_qpsolution(quad_prob_values, constraints(quad_prob_values->X0, quad_prob_values->param));
     return solve(quad_prob_values, &prev_qpsolution, init, cpu_time);
 }
 
