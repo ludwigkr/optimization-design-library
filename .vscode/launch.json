@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "test",
+            "name": "python:test",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/test_optimization_design_library.py",
@@ -14,7 +14,7 @@
             "justMyCode": true
         },
         {
-            "name": "min_nlp",
+            "name": "python:min_nlp",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/min_nlp/ocp_min_nlp.py",
@@ -23,13 +23,35 @@
             "justMyCode": true
         },
         {
-            "name": "min_nlp_with_params",
+            "name": "python:min_nlp_with_params",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/min_nlp_with_params/ocp_min_nlp_with_params.py",
             "cwd": "${workspaceFolder}/min_nlp_with_params",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "cpp:min_nlp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/cpp_test/build/build/cpp-test",
+            "args": [],
+            "stopAtEntry": false,
+            "preLaunchTask": "make",
+            "cwd": "${workspaceFolder}/cpp_test/build/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "visualizerFile": "home/ludwig/Downloads/Eigen.natvis",
+            "showDisplayString": true,
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         }
     ]
 }
