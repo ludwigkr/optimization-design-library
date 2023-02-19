@@ -1,0 +1,12 @@
+#+title: Quadratic Optimizer
+
+The original problem:
+#+begin_center
+$$
+\underset{x}{\min}	f(x,p)
+$$
+$$
+\text{s. t.}	lbg\le g(x,p)\le ubg
+$$
+
+#+end_center
