@@ -51,6 +51,7 @@ class SolverTemplate : public QuadraticOptimizer {
     real_t lbA[N_CONSTRAINTS];
     real_t ubA[N_CONSTRAINTS];
 
+    float inf = std::numeric_limits<float>::infinity();
     SQProblem solver;
     double* _cpu_time;
 
