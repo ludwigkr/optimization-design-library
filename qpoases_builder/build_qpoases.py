@@ -135,7 +135,7 @@ class QpoasesBuilder:
         return ret
 
     def build_constraint_derivatives(self, op: OptimizationProblem, dconstr: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('dconstraints', dconstr)
+        ret = self.problem_build_helper.build_dense_matrix('dconstraints', dconstr, False)
         ret = self.subsitude_variables(ret, op)
         return ret
 

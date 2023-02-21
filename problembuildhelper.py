@@ -69,29 +69,39 @@ class ProblemBuildHelper:
             ret += 'double ' + var_name + str(i+1) + " = " + value + ";\n"
         return ret
 
-    def build_matrix_values(self, name, vals: [str])->str:
+    def build_entry_lhs(self, name: str, idx: str, as_vector: bool) -> str:
+        """Creates the lhs formulation of an entry for a value of a matrix or a vector. E.g. H[0] , dconst(1, 0)"""
+        if as_vector:
+            idxs = idx.replace('(', '').replace(')', '').split(',')
+            lhs = name + '[' + idxs[0] + ']'
+        else:
+            lhs = name + idx
+
+        return lhs
+
+    def build_matrix_values(self, name, vals: [str], as_vector: bool)->str:
         ret = ''
         temp_name = name + self.temporary
         for v, val in enumerate(vals):
-            entry = val.split('->')[1]
-            lhs = name + '[' + str(v) +']'
-            rhs = entry.replace('@', temp_name)
+            val_components = val.split('->')
+            lhs = self.build_entry_lhs(name, val_components[0], as_vector)
+            rhs = val_components[1].replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
         return ret
 
-    def build_vector_values(self, name, vals: [str]) -> str:
+    def build_vector_values(self, name, vals: [str], as_vector: bool) -> str:
         ret = ''
         temp_name = name + self.temporary
         for v, val in enumerate(vals):
-            entry = val.split('->')[1]
-            lhs = name + '[' + str(v) +']'
-            rhs = entry.replace('@', temp_name)
+            val_components = val.split('->')
+            lhs = self.build_entry_lhs(name, val_components[0], as_vector)
+            rhs = val_components[1].replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
         return ret
 
-    def build_dense_matrix(self, name: str, mat: casadi.SX):
+    def build_dense_matrix(self, name: str, mat: casadi.SX, as_vector=True):
         mat = casadi.SX(mat)
         smat = self.SX_sparse_str(mat)
         print(smat)
@@ -101,9 +111,9 @@ class ProblemBuildHelper:
         print(values)
         ret = self.build_matrix_definitions(name, definitions)
         if mat.size1() == 1 or mat.size2() == 1:
-            ret += self.build_vector_values(name, values) 
+            ret += self.build_vector_values(name, values, as_vector) 
         else:
-            ret += self.build_matrix_values(name, values)
+            ret += self.build_matrix_values(name, values, as_vector)
 
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
