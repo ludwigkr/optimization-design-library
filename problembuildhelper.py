@@ -44,7 +44,6 @@ class ProblemBuildHelper:
         variable_structure += "{}\n\n"
 
         variable_structure += "};"
-        print(variable_structure)
         return variable_structure
 
     def SX_sparse_str(self, mat: casadi.SX) -> str:
@@ -96,7 +95,7 @@ class ProblemBuildHelper:
         temp_name = name + self.temporary
         for v, val in enumerate(vals):
             val_components = val.split('->')
-            lhs = self.build_entry_lhs(name, val_components[0], as_vector)
+            lhs = self.build_entry_lhs(name, val_components[0], as_vector, 1)
             rhs = val_components[1].replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
@@ -105,11 +104,8 @@ class ProblemBuildHelper:
     def build_dense_matrix(self, name: str, mat: casadi.SX, as_vector=True):
         mat = casadi.SX(mat)
         smat = self.SX_sparse_str(mat)
-        print(smat)
         definitions = [e.replace(',', '') for e in smat if e[0] == '@']
         values = [e for e in smat if e[0] == '(']
-        print(definitions)
-        print(values)
         ret = self.build_matrix_definitions(name, definitions)
         if mat.size1() == 1 or mat.size2() == 1:
             ret += self.build_vector_values(name, values, as_vector) 
