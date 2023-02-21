@@ -69,22 +69,23 @@ class ProblemBuildHelper:
             ret += 'double ' + var_name + str(i+1) + " = " + value + ";\n"
         return ret
 
-    def build_entry_lhs(self, name: str, idx: str, as_vector: bool) -> str:
+    def build_entry_lhs(self, name: str, idx_str: str, as_vector: bool, mat_size=0) -> str:
         """Creates the lhs formulation of an entry for a value of a matrix or a vector. E.g. H[0] , dconst(1, 0)"""
         if as_vector:
-            idxs = idx.replace('(', '').replace(')', '').split(',')
-            lhs = name + '[' + idxs[0] + ']'
+            idxs = idx_str.replace('(', '').replace(')', '').split(',')
+            idx = int(idxs[0]) + mat_size * int(idxs[1])
+            lhs = name + '[' + str(idx) + ']'
         else:
-            lhs = name + idx
+            lhs = name + idx_str
 
         return lhs
 
-    def build_matrix_values(self, name, vals: [str], as_vector: bool)->str:
+    def build_matrix_values(self, name, vals: [str], as_vector: bool, mat_size2: int)->str:
         ret = ''
         temp_name = name + self.temporary
         for v, val in enumerate(vals):
             val_components = val.split('->')
-            lhs = self.build_entry_lhs(name, val_components[0], as_vector)
+            lhs = self.build_entry_lhs(name, val_components[0], as_vector, mat_size2)
             rhs = val_components[1].replace('@', temp_name)
             ret += lhs + " = " + rhs + ';\n'
 
@@ -113,7 +114,7 @@ class ProblemBuildHelper:
         if mat.size1() == 1 or mat.size2() == 1:
             ret += self.build_vector_values(name, values, as_vector) 
         else:
-            ret += self.build_matrix_values(name, values, as_vector)
+            ret += self.build_matrix_values(name, values, as_vector, mat.size2())
 
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
