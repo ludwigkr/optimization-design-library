@@ -9,16 +9,13 @@ TEST_GROUP(MinNLP) {
     MinNLPInterface opti;
 };
 
-TEST(MinNLP, functiontest_casadi) {
-
+TEST(MinNLP, test_case) {
     opti.init();
-    // opti.init_casadi("../../ocp_design/casadi/min_nlp/min_nlp_optimizer.so");
-    // opti.use_trustregionmethod = true;
     Eigen::VectorXd sp(2);
-    sp[0] = 0;
-    sp[1] = 0;
+    sp[0] = 10;
+    sp[1] = 10;
     auto opti_res = opti.find_optimal_solution(sp);
-    // std::cout << "Xopt:" << opti_res.transpose() << std::endl;
-
-    CHECK(opti_res.norm()<1e-6);
+    Eigen::VectorXd Xopt_check(2);
+    Xopt_check << 2.5, 4.5;
+    CHECK((opti_res-Xopt_check).norm()<1e-6);
 }
