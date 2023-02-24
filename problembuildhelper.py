@@ -21,7 +21,7 @@ class ProblemBuildHelper:
         # variables definition in structure
         variable_structure = "struct " + name + "{\n"
         for vi, v in enumerate(var.variables):
-            if v.size1() == 1 and v.size_2() == 1:
+            if v.size1() == 1 and v.size2() == 1:
                 variable_structure += "    float " + var.names[vi] + ";\n"
             else:
                 variable_structure += "    Eigen::VectorXd " + var.names[vi] + ";\n"
@@ -29,7 +29,7 @@ class ProblemBuildHelper:
         # constructor header:
         variable_structure += "\n    " + name + "("
         for vi, v in enumerate(var.variables):
-            if v.size1() == 1 and v.size_2() == 1:
+            if v.size1() == 1 and v.size2() == 1:
                 variable_structure += "float _" + var.names[vi] + ", "
             else:
                 variable_structure += "Eigen::VectorXd _" + var.names[vi] + ", "
