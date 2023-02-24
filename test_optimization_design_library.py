@@ -3,6 +3,7 @@ import unittest
 import casadi
 import numpy as np
 
+sys.path.append('./min_nlp')
 sys.path.append('./min_nlp_with_params')
 from optimizationproblem import OptimizationProblem
 
