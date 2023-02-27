@@ -12,11 +12,11 @@ class CppBuilder:
         self.build_qpoases = True
         pass
 
-    def build(self, op: OptimizationProblem) -> None:
+    def build(self, op: OptimizationProblem, path=None) -> None:
         self.quadratic_elements = QuadraticOptimizerElements(op)
         if self.build_qpoases:
             qpoases_builder = QpoasesBuilder()
-            qpoases_builder.build(op, self.quadratic_elements)
+            qpoases_builder.build(op, self.quadratic_elements, path)
 
 
         pass

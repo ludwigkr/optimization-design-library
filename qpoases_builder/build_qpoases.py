@@ -2,6 +2,7 @@
 import os
 import sys
 import casadi
+from pathlib import Path
 
 local_folder_path = os.path.dirname(__file__)
 sys.path.append(local_folder_path + "../")
@@ -13,12 +14,12 @@ class QpoasesBuilder:
     def __init__(self) -> None:
         self.problem_build_helper = ProblemBuildHelper()
 
-    def build(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements) -> None:
-        self.builder_header(op)
-        self.build_source(op, qoe)
+    def build(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path:str) -> None:
+        self.builder_header(op, path)
+        self.build_source(op, qoe, path)
 
 
-    def builder_header(self, op: OptimizationProblem) -> None:
+    def builder_header(self, op: OptimizationProblem, path: str) -> None:
             with open(local_folder_path + '/solvertemplate_qpoases.h', 'r') as f:
                 header = f.read()
 
@@ -33,12 +34,15 @@ class QpoasesBuilder:
             header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameter))
             header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameter))
 
-            file_name = op.name + "_quad_opti_qpoases.h"
-            print(file_name)
-            with open('./' + file_name, "w") as f:
+            if path is None:
+                file_path = './' + op.name + "_quad_opti_qpoases.h"
+            else:
+                file_path = Path(path + '/' + op.name).expanduser()
+            print(file_path)
+            with open(file_path, "w") as f:
                 f.write(header)
 
-    def build_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements) -> None:
+    def build_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path: str) -> None:
         n_constraints = op.constraints.n_constraints 
         n_xopts = op.optvars.n_vars
 
@@ -92,9 +96,12 @@ class QpoasesBuilder:
         ubg = self.build_ubg(op, op.fn_ubg.call())
         source = source.replace("    /* UBG PLACEHOLDER*/", ubg)
 
-        file_name = op.name + "_quad_opti_qpoases.cpp"
-        print(file_name)
-        with open('./' + file_name, "w") as f:
+        if path is None:
+            file_path = './' + op.name + "_quad_opti_qpoases.cpp"
+        else:
+            file_path = Path(path + '/' + op.name).expanduser()
+        print(file_path)
+        with open(file_path, "w") as f:
             f.write(source)
  
     def subsitude_variables(self, exp: str, op: OptimizationProblem) -> str:
