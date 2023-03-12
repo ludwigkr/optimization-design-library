@@ -76,7 +76,6 @@ class TestOptimizationProblem(unittest.TestCase):
         self.assertTrue(f.nnz_in() == 3)
         self.assertTrue(f.n_out() == 1)
 
-
         x0 = np.array([1, 0])
         y0 = 2
         res = f(x0, y0)
