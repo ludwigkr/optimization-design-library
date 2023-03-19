@@ -108,7 +108,7 @@ class ProblemBuildHelper:
         values = [e for e in smat if e[0] == '(']
         ret = self.build_matrix_definitions(name, definitions)
         if mat.size1() == 1 or mat.size2() == 1:
-            ret += self.build_vector_values(name, values, as_vector) 
+            ret += self.build_vector_values(name, values, as_vector)
         else:
             ret += self.build_matrix_values(name, values, as_vector, mat.size2())
 
@@ -124,7 +124,7 @@ class ProblemBuildHelper:
             exp = exp.replace(search_pattern, replace_pattern)
 
         return exp
-        
+
 
     def substitute_variable(self, exp: str, name: str, link_symbol: str, vars: Variables) -> str:
         for v, var in enumerate(vars.names):
@@ -143,7 +143,7 @@ class ProblemBuildHelper:
             N = np.size(pidxs)
             for n in reversed(range(N)):
                 search_pattern = param_name + '_' + str(n)
-                replace_pattern = name  + str(pidxs[n])
+                replace_pattern = name  + str(pidxs.T.reshape(-1, 1)[n][0])
                 exp = exp.replace(search_pattern, replace_pattern)
 
         return exp
