@@ -37,7 +37,7 @@ class QpoasesBuilder:
             if path is None:
                 file_path = './' + op.name + "_quad_opti_qpoases.h"
             else:
-                file_path = Path(path + '/' + op.name).expanduser()
+                file_path = Path(path + '/' + op.name + "_quad_opti_qpoases.h").expanduser()
             print(file_path)
             with open(file_path, "w") as f:
                 f.write(header)
@@ -99,7 +99,7 @@ class QpoasesBuilder:
         if path is None:
             file_path = './' + op.name + "_quad_opti_qpoases.cpp"
         else:
-            file_path = Path(path + '/' + op.name).expanduser()
+            file_path = Path(path + '/' + op.name + "_quad_opti_qpoases.cpp").expanduser()
         print(file_path)
         with open(file_path, "w") as f:
             f.write(source)
