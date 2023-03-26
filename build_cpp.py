@@ -40,7 +40,7 @@ class CppBuilder:
             else:
                 index_header += "    " + name + "_first = " + str(idxs[0, 0]) + ",\n"
                 index_header += "    " + name + "_last = " + str(idxs[-1, -1]) + ",\n"
-        index_header += "};n"
+        index_header += "};\n"
         index_header += "\n"
         index_header += "enum inequality_constraint_idx {\n"
         for j, idxs_key in enumerate(op.constraints.idxs):
