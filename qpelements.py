@@ -17,4 +17,5 @@ class QuadraticOptimizerElements:
         for c in range(n_constr):
             self.objective_hessian += casadi.jacobian(lam_g[c] * self.constraints_jacobian[c,:], optvars)
 
-        self.cx0minusdcx0 = constraints - self.constraints_jacobian@optvars
+        if n_constr > 0:
+            self.cx0minusdcx0 = constraints - self.constraints_jacobian@optvars
