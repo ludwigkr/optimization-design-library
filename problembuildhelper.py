@@ -48,8 +48,9 @@ class ProblemBuildHelper:
 
     def SX_sparse_str(self, mat: casadi.SX) -> str:
         tmp_file = '/tmp/opti_design_lib'
-        sys.stdout = open(tmp_file,'wt')
-        mat.print_sparse()
+        with open(tmp_file,'wt') as sys.stdout:
+        # sys.stdout = open(tmp_file,'wt')
+            mat.print_sparse()
         sys.stdout = sys.__stdout__
         with open(tmp_file, "r") as f:
             ret = f.read()
@@ -64,7 +65,7 @@ class ProblemBuildHelper:
         var_name = name + self.temporary
         for i, _def in enumerate(defs):
             value = _def.split('=')[-1]
-            value.replace('@', var_name)
+            value = value.replace('@', var_name)
             ret += 'double ' + var_name + str(i+1) + " = " + value + ";\n"
         return ret
 
@@ -117,11 +118,17 @@ class ProblemBuildHelper:
         ret = "\n".join(indendet_lines)
         return ret
 
-    def substitude_variable(self, exp: str, old_name: str, new_name: str, N: int) -> str:
-        for n in reversed(range(N)):
-            search_pattern = old_name + "_" + str(n)
-            replace_pattern = new_name + "[" + str(n) + "]"
+    def substitude_variable(self, exp: str, old_name: str, new_name: str, N: int, index_offset=0) -> str:
+        if N == 1:
+            search_pattern = old_name
+            replace_pattern = new_name + "[" + str(index_offset) + "]"
             exp = exp.replace(search_pattern, replace_pattern)
+
+        else:
+            for n in reversed(range(N)):
+                search_pattern = old_name + "_" + str(n)
+                replace_pattern = new_name + "[" + str(n + index_offset) + "]"
+                exp = exp.replace(search_pattern, replace_pattern)
 
         return exp
 

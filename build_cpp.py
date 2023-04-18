@@ -2,6 +2,7 @@
 import os
 import sys
 from pathlib import Path
+import pathlib
 
 local_folder_path = os.path.dirname(__file__)
 sys.path.append(local_folder_path + "/qpoases_builder")
@@ -20,6 +21,15 @@ class CppBuilder:
             qpoases_builder = QpoasesBuilder()
             qpoases_builder.build(op, self.quadratic_elements, path)
             self.build_index(op, path)
+            self.copy_dependencies(path)
+
+
+    def copy_dependencies(self, path=None) -> None:
+        library_path = str(pathlib.Path(__file__).parent.resolve())
+        if path != None:
+            cmd = 'cp ' + library_path + '/cpp/sqpmethod.* ' + library_path +'/cpp/quadraticoptimizer.h ' + path
+            os.popen(cmd)
+            print(cmd)
 
 
     def build_index(self, op: OptimizationProblem, path=None) -> None:
@@ -41,6 +51,19 @@ class CppBuilder:
                 index_header += "    " + name + "_first = " + str(idxs[0, 0]) + ",\n"
                 index_header += "    " + name + "_last = " + str(idxs[-1, -1]) + ",\n"
         index_header += "};\n"
+
+        index_header += "\n"
+        index_header += "enum param_idx {\n"
+        for j, idxs_key in enumerate(op.problem_parameter.idxs):
+            name = op.problem_parameter.names[j]
+            idxs = op.problem_parameter.idxs[idxs_key]
+            if len(idxs) == 1:
+                index_header += "    " + name + " = " + str(idxs[0, 0]) + ",\n"
+            else:
+                index_header += "    " + name + "_first = " + str(idxs[0, 0]) + ",\n"
+                index_header += "    " + name + "_last = " + str(idxs[-1, -1]) + ",\n"
+        index_header += "};\n"
+
         index_header += "\n"
         index_header += "enum inequality_constraint_idx {\n"
         for j, idxs_key in enumerate(op.constraints.idxs):

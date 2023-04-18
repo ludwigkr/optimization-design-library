@@ -43,7 +43,7 @@ class QpoasesBuilder:
                 f.write(header)
 
     def build_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path: str) -> None:
-        n_constraints = op.constraints.n_constraints 
+        n_constraints = op.constraints.n_constraints
         n_xopts = op.optvars.n_vars
 
         with open(local_folder_path + '/solvertemplate_qpoases.cpp', 'r') as f:
@@ -103,12 +103,18 @@ class QpoasesBuilder:
         print(file_path)
         with open(file_path, "w") as f:
             f.write(source)
- 
+
     def subsitude_variables(self, exp: str, op: OptimizationProblem) -> str:
-        ret = self.problem_build_helper.substitude_variable(exp, 'X', 'xopt', op.optvars.n_vars)
+
+        ret = exp
+        for optvar_name in op.optvars.names:
+            ret = self.problem_build_helper.substitude_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
+
+        for param_name in op.problem_parameter.names:
+            ret = self.problem_build_helper.sustitute_parameters(ret, param_name, 'param', op.problem_parameter.idxs[param_name].size, op.problem_parameter.idxs[param_name][0,0])
+
         ret = self.problem_build_helper.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
         ret = self.problem_build_helper.substitute_variable(ret, 'scenario', '->', op.scenario_parameter)
-        ret = self.problem_build_helper.sustitute_parameters(ret, 'param', op.problem_parameter)
         return ret
 
 
