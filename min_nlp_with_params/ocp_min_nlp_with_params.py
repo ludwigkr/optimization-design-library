@@ -23,7 +23,7 @@ def optimization_problem_min_nlp_with_params():
     X = ocp.optvars.block_by_name('X')
     # Create Optimization Parameters
     P = SX.sym("P", 1, 1)
-    ocp.problem_parameter.register('P', P)
+    ocp.problem_parameters.register('P', P)
 
     # Create constraints:
     constraint1 = X[1,:] - P[0, 0] * X[0,:]
@@ -42,8 +42,8 @@ if __name__ == "__main__":
     solver = optimizationsolver.build_solver(ocp, opts)
 
     # Call solver for one scenario:
-    scenario = ocp.scenario_parameter.packed([10, 10])
-    problem_parameters = ocp.problem_parameter.unpacked([1])
+    scenario = ocp.scenario_parameters.packed([10, 10])
+    problem_parameters = ocp.problem_parameters.unpacked([1])
 
     result = optimizationsolver.run(solver, ocp, scenario, problem_parameters)
 
@@ -51,13 +51,13 @@ if __name__ == "__main__":
     error = np.linalg.norm(np.array(result['x']) - np.array([[2.5, 4.5]]).T)
     assert(error < 1e-5)
 
-    # Check if parameter is actually changing the result:
-    problem_parameters = ocp.problem_parameter.unpacked([2])
+    # Check if parameters is actually changing the result:
+    problem_parameters = ocp.problem_parameters.unpacked([2])
     result = optimizationsolver.run(solver, ocp, scenario, problem_parameters)
     error = np.linalg.norm(np.array(result['x']) - np.array([[2.5, 4.5]]).T)
     assert(error > 1e-5) # Error should be different
 
-    # problem_parameters = ocp.problem_parameter.unpacked()
+    # problem_parameters = ocp.problem_parameters.unpacked()
     optimizationsolver.write_formulation(ocp, scenario, problem_parameters, result)
 
     cppbuilder = CppBuilder()

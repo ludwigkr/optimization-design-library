@@ -32,9 +32,9 @@ def optimization_problem_min_nlp():
     constraint1 = X[1,:] - X[0,:]
     ocp.constraints.register("c1", constraint1)
 
-    # Create scenario parameter:
+    # Create scenario parameters:
     SP = SX.sym('SP', ocp.optvars.n_vars, 1)
-    ocp.scenario_parameter.register("SP", SP)
+    ocp.scenario_parameters.register("SP", SP)
 
     # Create initial guess:
     X0 = SX.sym('X0', ocp.optvars.n_vars, 1)
@@ -62,10 +62,10 @@ if __name__ == "__main__":
 
 
     # Call solver for one scenario:
-    scenario = ocp.scenario_parameter.packed([10, 10])
+    scenario = ocp.scenario_parameters.packed([10, 10])
     result = optimizationsolver.run(solver, ocp, scenario)
 
-    problem_parameters = ocp.problem_parameter.unpacked()
+    problem_parameters = ocp.problem_parameters.unpacked()
     optimizationsolver.write_formulation(ocp, scenario, problem_parameters, result)
 
     # Check the result (for )
