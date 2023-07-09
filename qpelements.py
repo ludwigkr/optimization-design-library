@@ -5,7 +5,7 @@ from optimizationproblem import OptimizationProblem
 class QuadraticOptimizerElements:
     def __init__(self, op:OptimizationProblem):
         optvars = op.optvars.variables_flat()
-        params = op.problem_parameter.variables_flat()
+        params = op.problem_parameters.variables_flat()
         constraints = op.constraints.equations_flat()
         n_constr = op.constraints.n_constraints
         lam_g = casadi.SX.sym('lamg', n_constr, 1) # Langrange multiplier constraint equations

@@ -4,3 +4,20 @@ This repo shall support user in:
 - building optimization problems using the casadi library
 - Testing initial guess and constraints for the designed library
 - Exporting the optimizaiton problem to Casadi-independent CPP code.
+
+* Variables
+- =problem_parameters= (variable name: =prob_params=): Parameters of the optimization definition, passed to the optimizer (should but are not generated from scenario)
+  Generated in interface-class or higher
+- =scenario_parameters= (variable_name: =scenario=): All variables which are required to build initial guess or the limit vectors
+  Generated in interface-class or higher. Replaced before the optimization call with number, so they are not passed as parameter to the optimizer.
+
+- =quad_prob_parameter=: Collection of initial guess and limits passed to the optimizer classes
+  Generated in Interface-class
+- =optimizer_options=: Not yet used(?)
+
+* Developing strategy (for now)
+- Develop library in =project/optimizaiton_design_library=.
+- Test basic unittests here?
+- Build pats code:
+  Run the =test_ocp*= in =code/pats/base/ocp_design/<problem>/=.
+- Test pats code in =code/pats/base/unittest=.

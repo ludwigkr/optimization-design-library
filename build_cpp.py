@@ -54,9 +54,9 @@ class CppBuilder:
 
         index_header += "\n"
         index_header += "enum param_idx {\n"
-        for j, idxs_key in enumerate(op.problem_parameter.idxs):
-            name = op.problem_parameter.names[j]
-            idxs = op.problem_parameter.idxs[idxs_key]
+        for j, idxs_key in enumerate(op.problem_parameters.idxs):
+            name = op.problem_parameters.names[j]
+            idxs = op.problem_parameters.idxs[idxs_key]
             if len(idxs) == 1:
                 index_header += "    " + name + " = " + str(idxs[0, 0]) + ",\n"
             else:

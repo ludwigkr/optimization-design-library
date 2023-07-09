@@ -132,25 +132,17 @@ class ProblemBuildHelper:
 
         return exp
 
-
-    def substitute_variable(self, exp: str, name: str, link_symbol: str, vars: Variables) -> str:
+    def substitute_variable_in_struct(self, exp: str, sturct_name: str, link_symbol: str, vars: Variables) -> str:
         for v, var in enumerate(vars.names):
             N = vars.variables[v].size1() * vars.variables[v].size2()
             if N > 1:
                 for n in reversed(range(N)):
                     search_pattern = var + "_" + str(n)
-                    replace_pattern = name + link_symbol + var + "[" + str(n) + "]"
+                    replace_pattern = sturct_name + link_symbol + var + "[" + str(n) + "]"
                     exp = exp.replace(search_pattern, replace_pattern)
-
-        return exp
-
-    def sustitute_parameters(self, exp: str, name: str, params: Variables) -> str:
-        for p, param_name in enumerate(params.names):
-            pidxs = params.idxs[param_name]
-            N = np.size(pidxs)
-            for n in reversed(range(N)):
-                search_pattern = param_name + '_' + str(n)
-                replace_pattern = name  + str(pidxs.T.reshape(-1, 1)[n][0])
+            else:
+                search_pattern = var
+                replace_pattern = sturct_name + link_symbol + var
                 exp = exp.replace(search_pattern, replace_pattern)
 
         return exp

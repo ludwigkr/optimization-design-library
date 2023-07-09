@@ -60,23 +60,23 @@ def build_solver(op: OptimizationProblem, opts):
     assert(not op.fn_ubx.function.is_null())
     assert(not op.fn_lbg.function.is_null())
     assert(not op.fn_ubg.function.is_null())
-    op.fn_params.build('fn_problem_parameters', op.problem_parameter, op.scenario_parameter, op.problem_parameter.variables_flat())
+    op.fn_params.build('fn_problem_parameters', op.problem_parameters, op.scenario_parameters, op.problem_parameters.variables_flat())
     # assert(not op.fn_initial_guess.is_null())
 
-    solver = casadi.nlpsol('solver', opts["optimizer"], {'x': op.optvars.variables_flat(), 'p': op.problem_parameter.variables_flat(), 'f': op.objective, 'g': op.constraints.equations_flat()}, opts["options"])
+    solver = casadi.nlpsol('solver', opts["optimizer"], {'x': op.optvars.variables_flat(), 'p': op.problem_parameters.variables_flat(), 'f': op.objective, 'g': op.constraints.equations_flat()}, opts["options"])
     solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': False, 'cpp': False})
     os.system("gcc -fPIC -shared -O3 " + op.name + "_optimizer.cpp -o " + op.name + "_optimizer.so")
 
-    definition_export(op, op.exported_defines.code, op.trajectory_parameter.parameter)
+    definition_export(op, op.exported_defines.code, op.trajectory_parameters.parameter)
 
     return solver
 
-def run(solver, op: OptimizationProblem, scenario_parameter: Variables, parameters: Variables=None):
-    initial_guess = op.fn_initial_guess.call(parameters, scenario_parameter)
-    lb = op.fn_lbx.call(parameters, scenario_parameter)
-    ub = op.fn_ubx.call(parameters, scenario_parameter)
-    lbg = op.fn_lbg.call(parameters, scenario_parameter)
-    ubg = op.fn_ubg.call(parameters, scenario_parameter)
+def run(solver, op: OptimizationProblem, scenario_parameters: Variables, parameters: Variables=None):
+    initial_guess = op.fn_initial_guess.call(parameters, scenario_parameters)
+    lb = op.fn_lbx.call(parameters, scenario_parameters)
+    ub = op.fn_ubx.call(parameters, scenario_parameters)
+    lbg = op.fn_lbg.call(parameters, scenario_parameters)
+    ubg = op.fn_ubg.call(parameters, scenario_parameters)
 
     if parameters is not None:
         result = solver(x0=initial_guess, p=parameters, lbg=lbg, ubg=ubg, lbx=lb, ubx=ub)
@@ -89,12 +89,12 @@ def float2string(x):
     return str(f'{x:.2g}')
 
 
-def formulation(op: OptimizationProblem, scenario_parameter, problem_parameter, result=None):
-    init_guess = op.fn_initial_guess.call(problem_parameter, scenario_parameter)
-    lb = op.fn_lbx.call(problem_parameter, scenario_parameter)
-    ub = op.fn_ubx.call(problem_parameter, scenario_parameter)
-    lbg = op.fn_lbg.call(problem_parameter, scenario_parameter)
-    ubg = op.fn_ubg.call(problem_parameter, scenario_parameter)
+def formulation(op: OptimizationProblem, scenario_parameters, problem_parameters, result=None):
+    init_guess = op.fn_initial_guess.call(problem_parameters, scenario_parameters)
+    lb = op.fn_lbx.call(problem_parameters, scenario_parameters)
+    ub = op.fn_ubx.call(problem_parameters, scenario_parameters)
+    lbg = op.fn_lbg.call(problem_parameters, scenario_parameters)
+    ubg = op.fn_ubg.call(problem_parameters, scenario_parameters)
 
     variable_table = "| idx | optimization_variables | initial guess |   lbx |  ubx | optimized_values | lam_x |\n"
     variable_table +="|-----|------------------------|---------------|-------|------|------------------|-------|\n"
@@ -113,8 +113,8 @@ def formulation(op: OptimizationProblem, scenario_parameter, problem_parameter, 
     constraint_table +="|-----|------|------------|---|-----|-----|-------|-------|\n"
     idx_constrait_i = 0
     idx_constraint_block = 0
-    g0 = np.array(op.equation_values(init_guess, problem_parameter))
-    gopt = np.array(op.equation_values(result['x'], problem_parameter))
+    g0 = np.array(op.equation_values(init_guess, problem_parameters))
+    gopt = np.array(op.equation_values(result['x'], problem_parameters))
     for constraint_block_name in op.constraints.idxs:
         for idx_subconstraint in list(op.constraints.idxs[constraint_block_name]):
             local_idx_constraint = idx_constrait_i - op.constraints.idxs[constraint_block_name][0]
@@ -144,8 +144,8 @@ def formulation(op: OptimizationProblem, scenario_parameter, problem_parameter, 
     # print(formulation)
     return formulation
 
-def write_formulation(op: OptimizationProblem, scenario_parameter, parameter=None, result=None):
-    formulation_text = formulation(op, scenario_parameter, parameter, result)
+def write_formulation(op: OptimizationProblem, scenario_parameters, parameters=None, result=None):
+    formulation_text = formulation(op, scenario_parameters, parameters, result)
 
     file = "ocp_" + op.name + ".org"
     with open(file, "w") as f:

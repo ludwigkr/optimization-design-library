@@ -31,8 +31,8 @@ class QpoasesBuilder:
             header = header.replace("N_XOPTS", str(n_xopts))
             header = header.replace("N_CONSTRAINTS", str(n_constraints))
             header = header.replace("SolverTemplate", class_name)
-            header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameter))
-            header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameter))
+            header = header.replace("struct scenario_parameters;", self.problem_build_helper.variable_structure_definition("scenario_parameters", op.scenario_parameters))
+            header = header.replace("struct problem_parameters;",  self.problem_build_helper.variable_structure_definition("problem_parameters", op.problem_parameters))
 
             if path is None:
                 file_path = './' + op.name + "_quad_opti_qpoases.h"
@@ -56,7 +56,7 @@ class QpoasesBuilder:
         source = source.replace("N_XOPTS + N_CONSTRAINTS", str(n_xopts + n_constraints))
         source = source.replace("N_XOPTS", str(n_xopts))
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
-        source = source.replace("N_PARAMS", str(op.problem_parameter.n_vars))
+        source = source.replace("N_PARAMS", str(op.problem_parameters.n_vars))
 
         init_H = self.build_H(op, qoe.objective_hessian)
         source = source.replace("    /* INIT H PLACEHOLDER*/", init_H)
@@ -78,7 +78,7 @@ class QpoasesBuilder:
         dconstr = self.build_constraint_derivatives(op, qoe.constraints_jacobian)
         source = source.replace("    /* CONSTRAINT_DERIVATIVES PLACEHOLDER*/", dconstr)
 
-        parameters = self.build_parameters(op, op.problem_parameter.variables_flat())
+        parameters = self.build_parameters(op, op.problem_parameters.variables_flat())
         source = source.replace("    /* PARAMS PLACEHOLDER*/", parameters)
 
         initial_guess = self.build_initial_guess(op, op.fn_initial_guess.call())
@@ -110,11 +110,11 @@ class QpoasesBuilder:
         for optvar_name in op.optvars.names:
             ret = self.problem_build_helper.substitude_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
 
-        for param_name in op.problem_parameter.names:
-            ret = self.problem_build_helper.sustitute_parameters(ret, param_name, 'param', op.problem_parameter.idxs[param_name].size, op.problem_parameter.idxs[param_name][0,0])
+        for param_name in op.problem_parameters.names:
+            ret = self.problem_build_helper.substitude_variable(ret, param_name, 'prob_param', op.problem_parameters.idxs[param_name].size, op.problem_parameters.idxs[param_name][0,0])
 
         ret = self.problem_build_helper.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
-        ret = self.problem_build_helper.substitute_variable(ret, 'scenario', '->', op.scenario_parameter)
+        ret = self.problem_build_helper.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
         return ret
 
 
@@ -134,10 +134,10 @@ class QpoasesBuilder:
         return ret
 
     def build_bA(self, op: OptimizationProblem, bA_correction: casadi.SX) -> str:
-        lbA = op.fn_lbg.call(op.problem_parameter, op.scenario_parameter)
+        lbA = op.fn_lbg.call(op.problem_parameters, op.scenario_parameters)
         ret = self.problem_build_helper.build_dense_matrix('lbA', lbA)
 
-        ubA = op.fn_ubg.call(op.problem_parameter, op.scenario_parameter)
+        ubA = op.fn_ubg.call(op.problem_parameters, op.scenario_parameters)
         ret += '\n' + self.problem_build_helper.build_dense_matrix('ubA', ubA)
         ret = self.subsitude_variables(ret, op)
         return ret
