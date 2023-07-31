@@ -60,6 +60,18 @@ def build_solver(op: OptimizationProblem, opts):
     assert(not op.fn_ubx.function.is_null())
     assert(not op.fn_lbg.function.is_null())
     assert(not op.fn_ubg.function.is_null())
+    for scenario in op.scenario_parameters.names:
+        for xopt in op.optvars.names:
+            assert xopt not in scenario, f"{xopt} in {scenario}, please change either of the variable names."
+
+    for prob_param in op.problem_parameters.names:
+        for xopt in op.optvars.names:
+            assert xopt not in prob_param, f"{xopt} in {prob_param}, please change either of the variable names."
+
+    for prob_param in op.problem_parameters.names:
+        for scenario in op.scenario_parameters.names:
+            assert prob_param not in scenario, f"{scenario} in {prob_param}, please change either of the variable names."
+
     op.fn_params.build('fn_problem_parameters', op.problem_parameters, op.scenario_parameters, op.problem_parameters.variables_flat())
     # assert(not op.fn_initial_guess.is_null())
 
