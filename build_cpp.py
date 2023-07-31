@@ -21,15 +21,19 @@ class CppBuilder:
             qpoases_builder = QpoasesBuilder()
             qpoases_builder.build(op, self.quadratic_elements, path)
             self.build_index(op, path)
-            self.copy_dependencies(path)
+            self.copy_dependencies(path, "qpoases")
 
 
-    def copy_dependencies(self, path=None) -> None:
+    def copy_dependencies(self, path=None, solver=None) -> None:
         library_path = str(pathlib.Path(__file__).parent.resolve())
         if path != None:
-            cmd = 'cp ' + library_path + '/cpp/sqpmethod.* ' + library_path +'/cpp/quadraticoptimizer.h ' + path
+            cmd = 'cp ' + library_path + '/cpp/sqpmethod.* ' + library_path +'/cpp/quadraticoptimizer.h '
+            if solver == "qpoases":
+                cmd +=  library_path + '/cpp/qpoasesconfig.* '
+            cmd += path
             os.popen(cmd)
             print(cmd)
+
 
 
     def build_index(self, op: OptimizationProblem, path=None) -> None:

@@ -89,12 +89,12 @@ public:
     virtual std::string status_return_name(int status) = 0;
     virtual std::string quadratic_solver_library() = 0;
 
-    virtual Eigen::VectorXd initial_guess(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
-    virtual Eigen::VectorXd parameters(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
-    virtual Eigen::VectorXd ubx(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
-    virtual Eigen::VectorXd lbx(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
-    virtual Eigen::VectorXd ubg(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
-    virtual Eigen::VectorXd lbg(problem_parameter* prob_param, scenario_parameter* scenerio) = 0;
+    virtual Eigen::VectorXd parameter(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
+    virtual Eigen::VectorXd initial_guess(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
+    virtual Eigen::VectorXd ubx(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
+    virtual Eigen::VectorXd lbx(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
+    virtual Eigen::VectorXd ubg(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
+    virtual Eigen::VectorXd lbg(problem_parameter *prob_param, scenario_parameter *scenerio) = 0;
 
     double costs(Eigen::VectorXd X) {
         auto ret = 0.5 * X.transpose() * _H * X + X.transpose() * _g;

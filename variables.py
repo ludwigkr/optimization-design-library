@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import casadi
+from casadi import SX, DM
 import numpy as np
 
 class Variables:
@@ -9,14 +10,14 @@ class Variables:
         self.variables = [] # list of variables in blocks
         self.names = []
 
-    def __update_index(self, new_vars):
+    def __update_index(self, new_vars: casadi.SX):
         """Based on the new opimization variables optvars, determines their indices optvars_idxs and returns the updated total amount of optimizatin variables (which is seen for further optimization variables as prev_variable index) prev_n."""
         optvars_idxs = np.linspace(0, new_vars.size1() * new_vars.size2() - 1, new_vars.size1() * new_vars.size2(), dtype=int) + self.n_vars
         self.n_vars += new_vars.size1() * new_vars.size2()
 
         return optvars_idxs.reshape((new_vars.size1(), new_vars.size2()), order='F')
 
-    def register(self, name, new_vars):
+    def register(self, name:str, new_vars: casadi.SX):
         assert(type(new_vars) == casadi.casadi.SX)
         assert(type(name) == str)
         self.idxs[name] = self.__update_index(new_vars)
@@ -65,3 +66,45 @@ class Variables:
     def pack_variables_fn(self):
         """Function to convert convert flat variables to structured variables."""
         return casadi.Function('unpack_variables_fn', [self.variables_flat()], self.variables, ['flat'], self.names)
+
+if __name__ == "__main__":
+    import unittest
+
+    class TestVatiables(unittest.TestCase):
+        def setUp(self) -> None:
+            self.var = Variables()
+            var1 = SX.sym('var1', 2, 1)
+            self.var.register("var1", var1)
+            var2 = SX.sym('var2', 2, 1)
+            self.var.register("var2", var2)
+
+            return super().setUp()
+
+        def test_assign_values(self):
+
+            with self.subTest("packed"):
+                data = self.var.unpacked([[1,2], [3,4]])
+                packed = self.var.packed(data)
+                self.assertTrue(packed[0][0] == 1)
+
+            with self.subTest("buggy variable decleration"):
+                """If variables var1 and var2 are not symbolic, this leads to error. 
+                    Compare against packed-subtest."""
+                var = Variables()
+                var1 = SX(2, 1)
+                var.register("var1", var1)
+                var2 = SX(2, 1)
+                var.register("var2", var2)
+                data = var.unpacked([[1,2], [3,4]])
+                packed = var.packed(data)
+                self.assertFalse(packed[0][0] == 1)
+
+            # with self.subTest("structed variables assigning"):
+            #     print(self.var.pack_variables_fn())
+            #     print(self.var.pack_variables_fn()([1,2,3,4]))
+            #     print(self.var.unpacked([1,2], [3,4]))
+
+
+    unittest.main()
+
+

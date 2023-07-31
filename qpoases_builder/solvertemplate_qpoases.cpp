@@ -154,209 +154,173 @@
     "RET_SIMPLE_STATUS_P0",
     "RET_SIMPLE_STATUS_M1",
     "RET_SIMPLE_STATUS_M2",
-    "RET_SIMPLE_STATUS_M3"};
+    "RET_SIMPLE_STATUS_M3"
+};
 
 void SolverTemplate::init() {
-  solver = SQProblem(N_XOPTS, N_CONSTRAINTS);
-  Options options;
-  // options.setToDefault();
-  options.setToReliable();
-  options.printLevel = PL_NONE;
-  // options.enableRegularisation = BT_TRUE;
-  Eigen::VectorXd xopt = Eigen::VectorXd(N_XOPTS).setZero();
-  solver.setOptions(options);
-  memset(H, 0, sizeof(H));
-  Eigen::VectorXd lamg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
-  /* INIT H PLACEHOLDER*/
-  memset(g, 0, sizeof(g));
-  /* INIT g PLACEHOLDER*/
-  _H = Eigen::Map<Eigen::Matrix<double, N_XOPTS, N_XOPTS, Eigen::RowMajor>>(H);
-  _g = Eigen::Map<Eigen::VectorXd>(g, N_XOPTS);
+    solver = SQProblem(N_XOPTS, N_CONSTRAINTS);
+    Options options;
+    // options.setToDefault();
+    options.setToReliable();
+    options.printLevel = PL_NONE;
+    // options.enableRegularisation = BT_TRUE;
+    Eigen::VectorXd xopt = Eigen::VectorXd(N_XOPTS).setZero();
+    Eigen::VectorXd param = Eigen::VectorXd(N_PARAMS).setZero();
+    solver.setOptions(options);
+    memset(H, 0, sizeof(H));
+    Eigen::VectorXd lamg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
+    /* INIT H PLACEHOLDER*/
+    memset(g, 0, sizeof(g));
+    /* INIT g PLACEHOLDER*/
+    _H = Eigen::Map<Eigen::Matrix<double, N_XOPTS, N_XOPTS, Eigen::RowMajor>>(H);
+    _g = Eigen::Map<Eigen::VectorXd>(g, N_XOPTS);
 }
 
 void SolverTemplate::qp_setup(QPSettings qpsettings [[maybe_unused]]) {}
 
-Eigen::VectorXd
-SolverTemplate::constraints(quadratic_problem_values *quad_prob_values,
-                            problem_solution *prev_qpsolution) {
-  Eigen::VectorXd xopt = prev_qpsolution->Xopt;
-  Eigen::VectorXd param = quad_prob_values->param;
-  return constraints(xopt, param);
+Eigen::VectorXd SolverTemplate::constraints(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    Eigen::VectorXd xopt = prev_qpsolution->Xopt;
+    Eigen::VectorXd param = quad_prob_values->param;
+    return constraints(xopt, param);
 }
 
-Eigen::VectorXd SolverTemplate::constraints(Eigen::VectorXd xopt,
-                                            Eigen::VectorXd param
-                                            [[maybe_unused]]) {
-  Eigen::VectorXd constraints = Eigen::VectorXd(N_CONSTRAINTS).setZero();
-  /* CONSTRAINTS PLACEHOLDER*/
-  return constraints;
+Eigen::VectorXd SolverTemplate::constraints(Eigen::VectorXd xopt, Eigen::VectorXd param [[maybe_unused]]) {
+    Eigen::VectorXd constraints = Eigen::VectorXd(N_CONSTRAINTS).setZero();
+    /* CONSTRAINTS PLACEHOLDER*/
+    return constraints;
 }
 
-Eigen::MatrixXd SolverTemplate::constraint_derivative(
-    quadratic_problem_values *quad_prob_values,
-    problem_solution *prev_qpsolution) {
-  Eigen::VectorXd xopt = prev_qpsolution->Xopt;
-  Eigen::VectorXd param = quad_prob_values->param;
-  Eigen::MatrixXd dconstraints =
-      Eigen::MatrixXd(N_CONSTRAINTS, N_XOPTS).setZero();
-  /* CONSTRAINT_DERIVATIVES PLACEHOLDER*/
-  return dconstraints;
+Eigen::MatrixXd SolverTemplate::constraint_derivative(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    Eigen::VectorXd xopt = prev_qpsolution->Xopt;
+    Eigen::VectorXd param = quad_prob_values->param;
+    Eigen::MatrixXd dconstraints =
+        Eigen::MatrixXd(N_CONSTRAINTS, N_XOPTS).setZero();
+    /* CONSTRAINT_DERIVATIVES PLACEHOLDER*/
+    return dconstraints;
 }
 
-Eigen::VectorXd SolverTemplate::initial_guess(problem_parameter *prob_param
-                                              [[maybe_unused]],
-                                              scenario_parameter *scenario
-                                              [[maybe_unused]]) {
-  Eigen::VectorXd initial_guess = Eigen::VectorXd(N_XOPTS).setZero();
-  /* INITIAL_GUESS PLACEHOLDER*/
-  return initial_guess;
+Eigen::VectorXd SolverTemplate::initial_guess(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd initial_guess = Eigen::VectorXd(N_XOPTS).setZero();
+    /* INITIAL_GUESS PLACEHOLDER*/
+    return initial_guess;
 }
 
-Eigen::VectorXd SolverTemplate::parameters(problem_parameter *prob_param
-                                           [[maybe_unused]],
-                                           scenario_parameter *scenario
-                                           [[maybe_unused]]) {
-  Eigen::VectorXd parameters = Eigen::VectorXd(N_PARAMS).setZero();
-  /* PARAMS PLACEHOLDER*/
-  return parameters;
+Eigen::VectorXd SolverTemplate::parameter(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd parameters = Eigen::VectorXd(N_PARAMS).setZero();
+    /* PARAMS PLACEHOLDER*/
+    return parameters;
 }
 
-Eigen::VectorXd SolverTemplate::lbx(problem_parameter *prob_param
-                                    [[maybe_unused]],
-                                    scenario_parameter *scenario
-                                    [[maybe_unused]]) {
-  Eigen::VectorXd lbx = Eigen::VectorXd(N_XOPTS).setZero();
-  /* LBX PLACEHOLDER*/
-  return lbx;
+Eigen::VectorXd SolverTemplate::lbx(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd lbx = Eigen::VectorXd(N_XOPTS).setZero();
+    /* LBX PLACEHOLDER*/
+    return lbx;
 }
 
-Eigen::VectorXd SolverTemplate::ubx(problem_parameter *prob_param
-                                    [[maybe_unused]],
-                                    scenario_parameter *scenario
-                                    [[maybe_unused]]) {
-  Eigen::VectorXd ubx = Eigen::VectorXd(N_XOPTS).setZero();
-  /* UBX PLACEHOLDER*/
-  return ubx;
+Eigen::VectorXd SolverTemplate::ubx(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd ubx = Eigen::VectorXd(N_XOPTS).setZero();
+    /* UBX PLACEHOLDER*/
+    return ubx;
 }
 
-Eigen::VectorXd SolverTemplate::lbg(problem_parameter *prob_param
-                                    [[maybe_unused]],
-                                    scenario_parameter *scenario
-                                    [[maybe_unused]]) {
-  Eigen::VectorXd lbg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
-  /* LBG PLACEHOLDER*/
-  return lbg;
+Eigen::VectorXd SolverTemplate::lbg(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd lbg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
+    /* LBG PLACEHOLDER*/
+    return lbg;
 }
 
-Eigen::VectorXd SolverTemplate::ubg(problem_parameter *prob_param
-                                    [[maybe_unused]],
-                                    scenario_parameter *scenario
-                                    [[maybe_unused]]) {
-  Eigen::VectorXd ubg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
-  /* UBG PLACEHOLDER*/
-  return ubg;
+Eigen::VectorXd SolverTemplate::ubg(problem_parameter *prob_param [[maybe_unused]], scenario_parameter *scenario [[maybe_unused]]) {
+    Eigen::VectorXd ubg = Eigen::VectorXd(N_CONSTRAINTS).setZero();
+    /* UBG PLACEHOLDER*/
+    return ubg;
 }
 
-void SolverTemplate::update_matrix_H(quadratic_problem_values *quad_prob_values,
-                                     problem_solution *prev_qpsolution) {
-  Eigen::VectorXd xopt = prev_qpsolution->Xopt;
-  Eigen::VectorXd param = quad_prob_values->param;
-  Eigen::VectorXd lamg = prev_qpsolution->lagrange_multiplier;
-  /* UPDATE H PLACEHOLDER*/
+void SolverTemplate::update_matrix_H(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    Eigen::VectorXd xopt = prev_qpsolution->Xopt;
+    Eigen::VectorXd param = quad_prob_values->param;
+    Eigen::VectorXd lamg = prev_qpsolution->lagrange_multiplier;
+    /* UPDATE H PLACEHOLDER*/
 }
 
-void SolverTemplate::update_vector_g(quadratic_problem_values *quad_prob_values,
-                                     problem_solution *prev_qpsolution) {
-  Eigen::VectorXd xopt = prev_qpsolution->Xopt;
-  Eigen::VectorXd param = quad_prob_values->param;
-  /* INIT g PLACEHOLDER*/
+void SolverTemplate::update_vector_g(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    Eigen::VectorXd xopt = prev_qpsolution->Xopt;
+    Eigen::VectorXd param = quad_prob_values->param;
+    /* UPDATE g PLACEHOLDER*/
 }
 
-void SolverTemplate::update_matrix_A(quadratic_problem_values *quad_prob_values,
-                                     problem_solution *prev_qpsolution) {
-  Eigen::VectorXd xopt = prev_qpsolution->Xopt;
-  Eigen::VectorXd param = quad_prob_values->param;
-  /* UPDATE A PLACEHOLDER*/
+void SolverTemplate::update_matrix_A(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    Eigen::VectorXd xopt = prev_qpsolution->Xopt;
+    Eigen::VectorXd param = quad_prob_values->param;
+    /* UPDATE A PLACEHOLDER*/
 }
 
-void SolverTemplate::update_vectors_bA(
-    quadratic_problem_values *quad_prob_values [[maybe_unused]],
-    problem_solution *prev_qpsolution) {
-  Eigen::VectorXd lbg = quad_prob_values->lbg;
-  Eigen::VectorXd ubg = quad_prob_values->ubg;
-  Eigen::VectorXd param = quad_prob_values->param;
+void SolverTemplate::update_vectors_bA(quadratic_problem_values *quad_prob_values [[maybe_unused]], problem_solution *prev_qpsolution) {
+    Eigen::VectorXd lbg = quad_prob_values->lbg;
+    Eigen::VectorXd ubg = quad_prob_values->ubg;
+    Eigen::VectorXd param = quad_prob_values->param;
 
-  /* UPDATE bA PLACEHOLDER*/
+    /* UPDATE bA PLACEHOLDER*/
 
-  for (uint i = 0; i < N_CONSTRAINTS; i++) {
-    ubA[i] -= prev_qpsolution->Z[N_XOPTS + i];
-    lbA[i] -= prev_qpsolution->Z[N_XOPTS + i];
-  }
+    for (uint i = 0; i < N_CONSTRAINTS; i++) {
+        ubA[i] -= prev_qpsolution->Z[N_XOPTS + i];
+        lbA[i] -= prev_qpsolution->Z[N_XOPTS + i];
+    }
 }
 
-void SolverTemplate::update_vectors_bx(
-    quadratic_problem_values *quad_prob_values,
-    problem_solution *prev_qpsolution) {
-  for (uint lbxk = 0; lbxk < quad_prob_values->lbx.size(); lbxk++) {
-    lb[lbxk] = quad_prob_values->lbx[lbxk] - prev_qpsolution->Xopt[lbxk];
-  }
+void SolverTemplate::update_vectors_bx(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution) {
+    for (uint lbxk = 0; lbxk < quad_prob_values->lbx.size(); lbxk++) {
+        lb[lbxk] = quad_prob_values->lbx[lbxk] - prev_qpsolution->Xopt[lbxk];
+    }
 
-  for (uint ubxk = 0; ubxk < quad_prob_values->ubx.size(); ubxk++) {
-    ub[ubxk] = quad_prob_values->ubx[ubxk] - prev_qpsolution->Xopt[ubxk];
-  }
+    for (uint ubxk = 0; ubxk < quad_prob_values->ubx.size(); ubxk++) {
+        ub[ubxk] = quad_prob_values->ubx[ubxk] - prev_qpsolution->Xopt[ubxk];
+    }
 }
 
-problem_solution
-SolverTemplate::solve(quadratic_problem_values *quad_prob_values, bool init,
-                      double cpu_time) {
-  problem_solution prev_qpsolution(
-      quad_prob_values,
-      constraints(quad_prob_values->X0, quad_prob_values->param));
-  return solve(quad_prob_values, &prev_qpsolution, init, cpu_time);
+problem_solution SolverTemplate::solve(quadratic_problem_values *quad_prob_values, bool init, double cpu_time) {
+    problem_solution prev_qpsolution(quad_prob_values, constraints(quad_prob_values->X0, quad_prob_values->param));
+    return solve(quad_prob_values, &prev_qpsolution, init, cpu_time);
 }
 
-problem_solution
-SolverTemplate::solve(quadratic_problem_values *quad_prob_values,
-                      problem_solution *prev_qpsolution, bool init,
-                      double cpu_time) {
-  update_matrix_H(quad_prob_values, prev_qpsolution);
-  update_vector_g(quad_prob_values, prev_qpsolution);
-  update_matrix_A(quad_prob_values, prev_qpsolution);
-  update_vectors_bA(quad_prob_values, prev_qpsolution);
-  update_vectors_bx(quad_prob_values, prev_qpsolution);
-  int solver_status;
-  int nwsr = 5 * (N_XOPTS + N_CONSTRAINTS);
+problem_solution SolverTemplate::solve(quadratic_problem_values *quad_prob_values, problem_solution *prev_qpsolution, bool init, double cpu_time) {
+    update_matrix_H(quad_prob_values, prev_qpsolution);
+    update_vector_g(quad_prob_values, prev_qpsolution);
+    update_matrix_A(quad_prob_values, prev_qpsolution);
+    update_vectors_bA(quad_prob_values, prev_qpsolution);
+    update_vectors_bx(quad_prob_values, prev_qpsolution);
+    int solver_status;
+    int nwsr = 5 * (N_XOPTS + N_CONSTRAINTS);
 
-  if (cpu_time > 0)
-    _cpu_time = &cpu_time;
-  else
-    _cpu_time = nullptr;
+    if (cpu_time > 0)
+        _cpu_time = &cpu_time;
+    else
+        _cpu_time = nullptr;
 
-  if (!solver.isInitialised() || init)
-    solver_status = solver.init(H, g, A, lb, ub, lbA, ubA, nwsr, _cpu_time);
-  else
-    solver_status = solver.hotstart(H, g, A, lb, ub, lbA, ubA, nwsr, _cpu_time);
+    if (!solver.isInitialised() || init)
+        solver_status = solver.init(H, g, A, lb, ub, lbA, ubA, nwsr, _cpu_time);
+    else
+        solver_status = solver.hotstart(H, g, A, lb, ub, lbA, ubA, nwsr, _cpu_time);
 
-  real_t primal[N_XOPTS];
-  solver.getPrimalSolution(primal);
-  Eigen::VectorXd xopt =
-      prev_qpsolution->Xopt + Eigen::Map<Eigen::VectorXd>(primal, N_XOPTS);
-  real_t _dual[N_XOPTS + N_CONSTRAINTS];
-  solver.getDualSolution(_dual);
-  Eigen::VectorXd lagrange_multiplier =
-      -Eigen::Map<Eigen::VectorXd>(&(_dual[N_XOPTS]), N_CONSTRAINTS);
-  problem_solution ret =
-      problem_solution(xopt, constraints(xopt, quad_prob_values->param),
-                       lagrange_multiplier, solver.getObjVal(), solver_status);
+    real_t primal[N_XOPTS];
+    solver.getPrimalSolution(primal);
+    Eigen::VectorXd xopt =
+        prev_qpsolution->Xopt + Eigen::Map<Eigen::VectorXd>(primal, N_XOPTS);
+    real_t _dual[N_XOPTS + N_CONSTRAINTS];
+    solver.getDualSolution(_dual);
+    Eigen::VectorXd lagrange_multiplier =
+        -Eigen::Map<Eigen::VectorXd>(&(_dual[N_XOPTS]), N_CONSTRAINTS);
+    problem_solution ret =
+        problem_solution(xopt, constraints(xopt, quad_prob_values->param),
+                         lagrange_multiplier, solver.getObjVal(), solver_status);
 
-  if (qp_return_status(ret.status)) {
-    print_quadratic_problem_design(*quad_prob_values, ret);
-  }
+    if (qp_return_status(ret.status)) {
+        print_quadratic_problem_design(*quad_prob_values, ret);
+    }
 
-  ret.status = qp_return_status(ret.status);
-  // print_quadratic_problem(primal, _dual);
-  // print_array("H", N_XOPTS * N_XOPTS, H);
-  return ret;
+    ret.status = qp_return_status(ret.status);
+    // print_quadratic_problem(primal, _dual);
+    // print_array("H", N_XOPTS * N_XOPTS, H);
+    return ret;
 }
 
 // std::vector<Eigen::VectorXd> SolverTemplate::trajectory(Eigen::VectorXd xopt,
@@ -397,5 +361,5 @@ SolverTemplate::solve(quadratic_problem_values *quad_prob_values,
 // }
 
 std::string SolverTemplate::status_return_name(int status) {
-  return qpoases_status_names[status + 1];
+    return qpoases_status_names[status + 1];
 };

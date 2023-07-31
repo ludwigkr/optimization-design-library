@@ -31,8 +31,8 @@ class QpoasesBuilder:
             header = header.replace("N_XOPTS", str(n_xopts))
             header = header.replace("N_CONSTRAINTS", str(n_constraints))
             header = header.replace("SolverTemplate", class_name)
-            header = header.replace("struct scenario_parameters;", self.problem_build_helper.variable_structure_definition("scenario_parameters", op.scenario_parameters))
-            header = header.replace("struct problem_parameters;",  self.problem_build_helper.variable_structure_definition("problem_parameters", op.problem_parameters))
+            header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameters))
+            header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameters))
 
             if path is None:
                 file_path = './' + op.name + "_quad_opti_qpoases.h"
@@ -58,10 +58,17 @@ class QpoasesBuilder:
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
         source = source.replace("N_PARAMS", str(op.problem_parameters.n_vars))
 
-        init_H = self.build_H(op, qoe.objective_hessian)
+        init_H = self.build_initH(op, qoe.objective_hessian)
         source = source.replace("    /* INIT H PLACEHOLDER*/", init_H)
+
+        update_H = self.build_updateH(op, qoe.objective_hessian)
+        source = source.replace("    /* UPDATE H PLACEHOLDER*/", update_H)
+
         init_g = self.build_initg(op, qoe.objective_jacobian)
         source = source.replace("    /* INIT g PLACEHOLDER*/", init_g)
+
+        update_g = self.build_updateg(op, qoe.objective_jacobian)
+        source = source.replace("    /* UPDATE g PLACEHOLDER*/", update_g)
 
         A = self.build_A(op, qoe.constraints_jacobian)
         source = source.replace("    /* UPDATE A PLACEHOLDER*/", A)
@@ -72,7 +79,7 @@ class QpoasesBuilder:
         c = self.build_constraints(op, op.constraints.equations_flat())
         source = source.replace("    /* CONSTRAINTS PLACEHOLDER*/", c)
 
-        H = self.build_H(op, qoe.objective_hessian)
+        H = self.build_updateH(op, qoe.objective_hessian)
         source = source.replace("    /* UPDATE H PLACEHOLDER*/", H)
 
         dconstr = self.build_constraint_derivatives(op, qoe.constraints_jacobian)
@@ -104,23 +111,31 @@ class QpoasesBuilder:
         with open(file_path, "w") as f:
             f.write(source)
 
-    def subsitude_variables(self, exp: str, op: OptimizationProblem) -> str:
+    def subsitude_variables(self, exp: str, op: OptimizationProblem, prob_param_as_struct=False) -> str:
 
         ret = exp
         for optvar_name in op.optvars.names:
             ret = self.problem_build_helper.substitude_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
 
-        for param_name in op.problem_parameters.names:
-            ret = self.problem_build_helper.substitude_variable(ret, param_name, 'prob_param', op.problem_parameters.idxs[param_name].size, op.problem_parameters.idxs[param_name][0,0])
+        if prob_param_as_struct:
+            ret = self.problem_build_helper.substitute_variable_in_struct(ret, "prob_param", "->", op.problem_parameters)
+        else:
+            for param_name in op.problem_parameters.names:
+                ret = self.problem_build_helper.substitude_variable(ret, param_name, 'param', op.problem_parameters.idxs[param_name].size, op.problem_parameters.idxs[param_name][0,0])
 
         ret = self.problem_build_helper.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
         ret = self.problem_build_helper.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
         return ret
 
 
-    def build_H(self, op: OptimizationProblem, H: casadi.SX) -> str:
+    def build_initH(self, op: OptimizationProblem, H: casadi.SX) -> str:
         ret = self.problem_build_helper.build_dense_matrix('H', H)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        return ret
+
+    def build_updateH(self, op: OptimizationProblem, H: casadi.SX) -> str:
+        ret = self.problem_build_helper.build_dense_matrix('H', H)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_initg(self, op: OptimizationProblem, g: casadi.SX) -> str:
@@ -128,9 +143,14 @@ class QpoasesBuilder:
         ret = self.subsitude_variables(ret, op)
         return ret
 
+    def build_updateg(self, op: OptimizationProblem, g: casadi.SX) -> str:
+        ret = self.problem_build_helper.build_dense_matrix('g', g)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        return ret
+
     def build_A(self, op: OptimizationProblem, A: casadi.SX) -> str:
         ret = self.problem_build_helper.build_dense_matrix('A', A)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_bA(self, op: OptimizationProblem, bA_correction: casadi.SX) -> str:
@@ -139,22 +159,22 @@ class QpoasesBuilder:
 
         ubA = op.fn_ubg.call(op.problem_parameters, op.scenario_parameters)
         ret += '\n' + self.problem_build_helper.build_dense_matrix('ubA', ubA)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_constraints(self, op: OptimizationProblem, constraints: casadi.SX) -> str:
         ret = self.problem_build_helper.build_dense_matrix('constraints', constraints)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_constraint_derivatives(self, op: OptimizationProblem, dconstr: casadi.SX) -> str:
         ret = self.problem_build_helper.build_dense_matrix('dconstraints', dconstr, False)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_parameters(self, op: OptimizationProblem, parameters: casadi.SX):
         ret = self.problem_build_helper.build_dense_matrix('parameters', parameters)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.subsitude_variables(ret, op, True)
         return ret
 
     def build_initial_guess(self, op: OptimizationProblem, initial_guess: casadi.SX):
