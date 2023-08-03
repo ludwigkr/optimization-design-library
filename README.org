@@ -4,6 +4,11 @@ This repo shall support user in:
 - building optimization problems using the casadi library
 - Testing initial guess and constraints for the designed library
 - Exporting the optimizaiton problem to Casadi-independent CPP code.
+  
+Why you might want casadi indepent code?
+- Casadi implement of SQPMethod has random significant delays during runtime. With building Casadi indepent code, this projects wants solve this problem or at least make it checkable where this delays are coming from.
+- Reduce package size
+- Improve readability and thus debuggability of generated code.
 
 * Overview SQPMethod runtime logic
 
