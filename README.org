@@ -5,6 +5,12 @@ This repo shall support user in:
 - Testing initial guess and constraints for the designed library
 - Exporting the optimizaiton problem to Casadi-independent CPP code.
 
+* Overview SQPMethod runtime logic
+
+*WARNING:* The SQPMethod is a reimplementation of Casadis SQPMethod. Therefore, it is in best case as good as Casadis SQPMethod. Casadis SQPMethod is not ready for production!
+
+  [[file:doc/optimization-design-library-design.svg]]
+
 * Variables
 - =problem_parameters= (variable name: =prob_params=): Parameters of the optimization definition, passed to the optimizer (should but are not generated from scenario)
   Generated in interface-class or higher
@@ -14,6 +20,8 @@ This repo shall support user in:
 - =quad_prob_parameter=: Collection of initial guess and limits passed to the optimizer classes
   Generated in Interface-class
 - =optimizer_options=: Not yet used(?)
+
+  [[file:doc/variable-process-overview.svg]]
 
 * Developing strategy (for now)
 - Develop library in =project/optimizaiton_design_library=.
