@@ -6,13 +6,17 @@ import pathlib
 
 local_folder_path = os.path.dirname(__file__)
 sys.path.append(local_folder_path + "/qpoases_builder")
+sys.path.append(local_folder_path + "/ipopt_builder")
+
 from build_qpoases import QpoasesBuilder
+from build_ipopt import IpoptBuilder
 from optimizationproblem import OptimizationProblem
 from qpelements import QuadraticOptimizerElements
 
 class CppBuilder:
     def __init__(self) -> None:
-        self.build_qpoases = True
+        self.build_qpoases = False
+        self.build_iptopt = True
         pass
 
     def build(self, op: OptimizationProblem, path=None) -> None:
@@ -22,6 +26,10 @@ class CppBuilder:
             qpoases_builder.build(op, self.quadratic_elements, path)
             self.build_index(op, path)
             self.copy_dependencies(path, "qpoases")
+        if self.build_iptopt:
+            ipopt_builder = IpoptBuilder()
+            ipopt_builder.build(op, self.quadratic_elements, path)
+            self.build_index(op, path)
 
 
     def copy_dependencies(self, path=None, solver=None) -> None:

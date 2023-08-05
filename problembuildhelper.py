@@ -11,11 +11,13 @@ class ProblemBuildHelper:
         self.temporary = '_temporary'
         pass
 
-    def class_name(self, name: str) -> str:
+    def class_name(self, name: str, quadratic_optimier=False) -> str:
         name = name.replace("_", " ")
         name = name.title()
         name = name.replace(" ", "")
-        return name + "QuadraticOptimizer"
+        if quadratic_optimier:
+            name = name + "QuadraticOptimizer"
+        return name
 
     def variable_structure_definition(self, name: str, var: Variables) -> str:
         # variables definition in structure
