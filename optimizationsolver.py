@@ -76,7 +76,7 @@ def build_solver(op: OptimizationProblem, opts):
     # assert(not op.fn_initial_guess.is_null())
 
     solver = casadi.nlpsol('solver', opts["optimizer"], {'x': op.optvars.variables_flat(), 'p': op.problem_parameters.variables_flat(), 'f': op.objective, 'g': op.constraints.equations_flat()}, opts["options"])
-    solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': False, 'cpp': False})
+    solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': True, 'cpp': True})
     os.system("gcc -fPIC -shared -O3 " + op.name + "_optimizer.cpp -o " + op.name + "_optimizer.so")
 
     definition_export(op, op.exported_defines.code, op.trajectory_parameters.parameter)
