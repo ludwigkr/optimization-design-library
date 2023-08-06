@@ -61,6 +61,20 @@ class ProblemBuildHelper:
         ret = ret.replace(' ', '')
         ret = ret.split('\n')
         return ret
+    
+    def SX_dense_str(self, mat: casadi.SX) -> str:
+        tmp_file = '/tmp/opti_design_lib'
+        with open(tmp_file,'wt') as sys.stdout:
+        # sys.stdout = open(tmp_file,'wt')
+            mat.print_dense()
+        sys.stdout = sys.__stdout__
+        with open(tmp_file, "r") as f:
+            ret = f.read()
+        with open(tmp_file, "w"):
+            pass
+        # ret = ret.replace(' ', '')
+        ret = ret.split(',')
+        return ret
 
     def build_matrix_definitions(self, name, defs: [str]) -> str:
         ret = ""
@@ -93,6 +107,23 @@ class ProblemBuildHelper:
 
         return ret
 
+    def build_matrix_values_dense(self, name, vals: [str]):
+        ret = ''
+        row = 0
+        column = 0
+        temp_name = name + self.temporary
+        for v, val in enumerate(vals):
+            original_val = val
+            val = val.replace('[','').replace(']','').replace('\n','').replace(' ', '')
+            ret += f"{name}[{row},{column}] = {val};\n"
+            column += 1
+            if ']' in original_val:
+                column = 0
+                row += 1
+
+        ret = ret.replace("@", temp_name)
+        return ret
+
     def build_vector_values(self, name, vals: [str], as_vector: bool) -> str:
         ret = ''
         temp_name = name + self.temporary
@@ -104,16 +135,24 @@ class ProblemBuildHelper:
 
         return ret
 
-    def build_dense_matrix(self, name: str, mat: casadi.SX, as_vector=True):
+    def build_matrix(self, name: str, mat: casadi.SX, as_vector=True, dense=False):
         mat = casadi.SX(mat)
-        smat = self.SX_sparse_str(mat)
-        definitions = [e.replace(',', '') for e in smat if e[0] == '@']
-        values = [e for e in smat if e[0] == '(']
-        ret = self.build_matrix_definitions(name, definitions)
-        if mat.size1() == 1 or mat.size2() == 1:
-            ret += self.build_vector_values(name, values, as_vector)
+        if not dense:
+            smat = self.SX_sparse_str(mat)
+            definitions = [e.replace(',', '') for e in smat if e[0] == '@']
+            values = [e for e in smat if e[0] == '(']
+            ret = self.build_matrix_definitions(name, definitions)
+            if mat.size1() == 1 or mat.size2() == 1:
+                ret += self.build_vector_values(name, values, as_vector)
+            else:
+                ret += self.build_matrix_values(name, values, as_vector, mat.size2())
+
         else:
-            ret += self.build_matrix_values(name, values, as_vector, mat.size2())
+            smat = self.SX_dense_str(mat)
+            definitions = [e for e in smat if e[0] == '@']
+            values = [e for e in smat if e[0] != '@']
+            ret = self.build_matrix_definitions(name, definitions)
+            ret += self.build_matrix_values_dense(name, values)
 
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
@@ -148,3 +187,33 @@ class ProblemBuildHelper:
                 exp = exp.replace(search_pattern, replace_pattern)
 
         return exp
+
+    def subsitude_variables(self, exp: str, op: OptimizationProblem, prob_param_as_struct=False) -> str:
+
+        ret = exp
+        for optvar_name in op.optvars.names:
+            ret = self.substitude_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
+
+        if prob_param_as_struct:
+            ret = self.substitute_variable_in_struct(ret, "prob_param", "->", op.problem_parameters)
+        else:
+            for param_name in op.problem_parameters.names:
+                ret = self.substitude_variable(ret, param_name, 'param', op.problem_parameters.idxs[param_name].size, op.problem_parameters.idxs[param_name][0,0])
+
+        ret = self.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
+        ret = self.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
+        return ret
+
+    def build_vectormatrix_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, dense=False):
+        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, dense=dense)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        return ret
+
+    def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, dense=False):
+        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, dense)
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+
+        ret_split = ret.split("=")
+        val_name = ret_split[0].split("[")[0].replace(" ", "")
+        ret = val_name + " = " + ret_split[1]
+        return ret

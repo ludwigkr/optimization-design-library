@@ -27,6 +27,7 @@ class CppBuilder:
             self.build_index(op, path)
             self.copy_dependencies(path, "qpoases")
         if self.build_iptopt:
+            op.build_lagrangian()
             ipopt_builder = IpoptBuilder()
             ipopt_builder.build(op, self.quadratic_elements, path)
             self.build_index(op, path)
