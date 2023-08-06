@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import casadi
 import numpy as np
+from casadi import SX, DM
 
 from variables import Variables
 from function import Function
@@ -28,6 +29,8 @@ class OptimizationProblem:
         self.name = "optization_problem"
         self.version = "1.0.0"
         self.objective = None
+        self.objective_jacobian = None
+        self.objective_hessian = None
         self.constraints = Constraints()
         self.optvars = Variables()
         self.problem_parameters = Variables() # Variables passed to the solver, but which cannot be changed by it. E.g. plane orientation, etc..
@@ -40,10 +43,15 @@ class OptimizationProblem:
         self.fn_ubx = Function()
         self.fn_lbg = Function()
         self.fn_ubg = Function()
+        self.lambdas = None
+        self.lagrangian = None
+        self.lagrangian_jacobian = None
+        self.lagrangian_hessian = None
 
     def register_objective(self, new_objective):
         self.objective = new_objective
-
+        self.objective_jacobian = casadi.jacobian(new_objective, self.optvars.variables_flat())
+        self.objective_hessian = casadi.jacobian(self.objective_jacobian, self.optvars.variables_flat())
 
     def rebuild_all_functions(self):
         self.fn_initial_guess.rebuild(self.problem_parameters, self.scenario_parameters)
@@ -85,3 +93,12 @@ class OptimizationProblem:
         if type(problem_parameters) == dict:
             problem_parameters = problem_parameters['flat']
         return fn(initial_guess, problem_parameters)
+
+    def build_lagrangian(self):
+        self.lagrangian = self.objective_hessian
+        self.lambdas = SX.sym("lamg", self.constraints.n_constraints, 1)
+        for i in range(self.constraints.n_constraints):
+            self.lagrangian += self.lambdas[i] * self.constraints.equations_flat()[i]
+
+        self.lagrangian_jacobian = casadi.jacobian(self.lagrangian, self.optvars.variables_flat())
+        self.lagrangian_hessian = casadi.jacobian(self.lagrangian_jacobian, self.optvars.variables_flat())
