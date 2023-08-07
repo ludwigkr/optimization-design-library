@@ -33,7 +33,13 @@ bool ProblemFormulation::get_bounds_info(Index n, Number *x_l, Number *x_u, Inde
     // If desired, we could assert to make sure they are what we think they are.
     assert(n == N_XOPTS);
     assert(m == N_CONSTRAINTS);
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
 
+    Number *lbx = x_l;
+    Number *ubx = x_u;
+    Number *lbg = g_l;
+    Number *ubg = g_u;
     // x_l[0] = -1.0;
     // x_u[0] = 1.0;
     // x_l[0] = -1.0;
@@ -64,6 +70,7 @@ bool ProblemFormulation::get_starting_point(Index n, bool init_x, Number *x, boo
     assert(init_z == false);
     assert(init_lambda == false);
 
+
     for (int i = 0; i < N_XOPTS; i++) {
         x[i] = initial_guess[i];
     }
@@ -73,7 +80,11 @@ bool ProblemFormulation::get_starting_point(Index n, bool init_x, Number *x, boo
 
 bool ProblemFormulation::eval_f(Index n, const Number *x, bool new_x, Number &obj_value) {
     // return the value of the objective function
-    Number x2 = x[1];
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
+    Number *xopt = x;
+    Number *param = parameter;
+    // Number x2 = x[1];
 
     // obj_value = -(x[1] - 2.0) * (x[1] - 2.0);
     /* OBJECTIVE PLACEHOLDER*/
@@ -82,7 +93,11 @@ bool ProblemFormulation::eval_f(Index n, const Number *x, bool new_x, Number &ob
 }
 
 bool ProblemFormulation::eval_grad_f(Index n, const Number *x, bool new_x, Number *grad_f) {
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
     // return the gradient of the objective function grad_{x} f(x)
+    Number *xopt = x;
+    Number *param = parameter;
 
     // grad_f[0] = 0.0;
     // grad_f[1] = -2.0 * (x[1] - 2.0);
@@ -92,7 +107,11 @@ bool ProblemFormulation::eval_grad_f(Index n, const Number *x, bool new_x, Numbe
 }
 
 bool ProblemFormulation::eval_g(Index n, const Number *x, bool new_x, Index m, Number *g) {
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
     // return the value of the constraints: g(x)
+    Number *xopt = x;
+    Number *param = parameter;
 
     // g[0] = -(x1 * x1 + x2 - 1.0);
     /* CONSTRAINTS PLACEHOLDER*/
@@ -101,6 +120,10 @@ bool ProblemFormulation::eval_g(Index n, const Number *x, bool new_x, Index m, N
 }
 
 bool ProblemFormulation::eval_jac_g(Index n, const Number *x, bool new_x, Index m, Index nele_jac, Index *iRow, Index *jCol, Number *values) {
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
+    Number *xopt = x;
+    Number *param = parameter;
     if (values == NULL) {
         // return the structure of the jacobian of the constraints
 
@@ -114,6 +137,8 @@ bool ProblemFormulation::eval_jac_g(Index n, const Number *x, bool new_x, Index 
         // iRow[1] = 1;
         // jCol[1] = 2;
     } else {
+        Number *xopt = x;
+        Number *param = parameter;
 
         /* CONSTRAINTS_JACOBIAN_SPARSE_VALUES PLACEHOLDER*/
         // return the values of the jacobian of the constraints
@@ -130,11 +155,13 @@ bool ProblemFormulation::eval_jac_g(Index n, const Number *x, bool new_x, Index 
 }
 
 bool ProblemFormulation::eval_h(Index n, const Number *x, bool new_x, Number obj_factor, Index m, const Number *lambda, bool new_lambda, Index nele_hess, Index *iRow, Index *jCol, Number *values) {
+    assert(scneario != nullptr);
+    assert(prob_param != nullptr);
     if (values == NULL) {
         // return the structure. This is a symmetric matrix, fill the lower left
         // triangle only.
 
-        /* CONSTRAINTS_JACOBIAN_SPARSE_INDEX PLACEHOLDER*/
+        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/
         // // element at 1,1: grad^2_{x1,x1} L(x,lambda)
         // iRow[0] = 1;
         // jCol[0] = 1;
@@ -145,9 +172,13 @@ bool ProblemFormulation::eval_h(Index n, const Number *x, bool new_x, Number obj
 
         // Note: off-diagonal elements are zero for this problem
     } else {
+        Number *xopt = x;
+        Number *param = parameter;
+        Number *lamg = lambda;
+
         // return the values
 
-        /* CONSTRAINTS_JACOBIAN_SPARSE_VALUES PLACEHOLDER*/
+        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/
         // element at 1,1: grad^2_{x1,x1} L(x,lambda)
         // values[0] = -2.0 * lambda[0];
 

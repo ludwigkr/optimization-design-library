@@ -31,8 +31,8 @@ class IpoptBuilder:
             header = header.replace("N_XOPTS", str(n_xopts))
             header = header.replace("N_CONSTRAINTS", str(n_constraints))
             header = header.replace("Problem", class_name)
-            # header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameters))
-            # header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameters))
+            header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameters))
+            header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameters))
 
             if path is None:
                 file_path = './' + op.name + "_problem_ipopt.h"
@@ -58,6 +58,18 @@ class IpoptBuilder:
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
         source = source.replace("N_PARAMS", str(op.problem_parameters.n_vars))
 
+        source = source.replace("/* OBJECTIVE PLACEHOLDER*/", self.problem_build_helper.build_scalar_for_optimizer_formulation(op, "obj_value", op.objective))
+        source = source.replace("    /* OBJECTIVE_JACOBIAN PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "grad_f", op.objective_jacobian.T, as_vector=True, dense=True))
+
+        constraint_jacobian = casadi.jacobian(op.constraints.equations_flat(), op.optvars.unpacked())
+        source = source.replace("        /* CONSTRAINTS_JACOBIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, constraint_jacobian))
+        source = source.replace("        /* CONSTRAINTS_JACOBIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, constraint_jacobian))
+
+
+        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, op.lagrangian_hessian))
+        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, op.lagrangian_hessian))
+        
+
         init_H = self.build_initH(op, qoe.objective_hessian)
         source = source.replace("    /* INIT H PLACEHOLDER*/", init_H)
 
@@ -76,8 +88,7 @@ class IpoptBuilder:
         bA = self.build_bA(op, qoe.cx0minusdcx0)
         source = source.replace("    /* UPDATE bA PLACEHOLDER*/", bA)
 
-        c = self.build_constraints(op, op.constraints.equations_flat())
-        source = source.replace("    /* CONSTRAINTS PLACEHOLDER*/", c)
+        source = source.replace("    /* CONSTRAINTS PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "g", op.constraints.equations_flat(), as_vector=True, dense=True))
 
         H = self.build_updateH(op, qoe.objective_hessian)
         source = source.replace("    /* UPDATE H PLACEHOLDER*/", H)
@@ -111,93 +122,78 @@ class IpoptBuilder:
         with open(file_path, "w") as f:
             f.write(source)
 
-    def subsitude_variables(self, exp: str, op: OptimizationProblem, prob_param_as_struct=False) -> str:
-
-        ret = exp
-        for optvar_name in op.optvars.names:
-            ret = self.problem_build_helper.substitude_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
-
-        if prob_param_as_struct:
-            ret = self.problem_build_helper.substitute_variable_in_struct(ret, "prob_param", "->", op.problem_parameters)
-        else:
-            for param_name in op.problem_parameters.names:
-                ret = self.problem_build_helper.substitude_variable(ret, param_name, 'param', op.problem_parameters.idxs[param_name].size, op.problem_parameters.idxs[param_name][0,0])
-
-        ret = self.problem_build_helper.substitude_variable(ret, 'lamg', 'lamg', op.constraints.n_constraints)
-        ret = self.problem_build_helper.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
-        return ret
 
 
     def build_initH(self, op: OptimizationProblem, H: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('H', H)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('H', H)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_updateH(self, op: OptimizationProblem, H: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('H', H)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('H', H)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_initg(self, op: OptimizationProblem, g: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('g', g)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('g', g)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 
     def build_updateg(self, op: OptimizationProblem, g: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('g', g)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('g', g)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_A(self, op: OptimizationProblem, A: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('A', A)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('A', A)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_bA(self, op: OptimizationProblem, bA_correction: casadi.SX) -> str:
         lbA = op.fn_lbg.call(op.problem_parameters, op.scenario_parameters)
-        ret = self.problem_build_helper.build_dense_matrix('lbA', lbA)
+        ret = self.problem_build_helper.build_matrix('lbA', lbA)
 
         ubA = op.fn_ubg.call(op.problem_parameters, op.scenario_parameters)
-        ret += '\n' + self.problem_build_helper.build_dense_matrix('ubA', ubA)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret += '\n' + self.problem_build_helper.build_matrix('ubA', ubA)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_constraints(self, op: OptimizationProblem, constraints: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('constraints', constraints)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('constraints', constraints)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_constraint_derivatives(self, op: OptimizationProblem, dconstr: casadi.SX) -> str:
-        ret = self.problem_build_helper.build_dense_matrix('dconstraints', dconstr, False)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.problem_build_helper.build_matrix('dconstraints', dconstr, False)
+        ret = self.problem_build_helper.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
     def build_parameters(self, op: OptimizationProblem, parameters: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('parameters', parameters)
-        ret = self.subsitude_variables(ret, op, True)
+        ret = self.problem_build_helper.build_matrix('parameters', parameters)
+        ret = self.problem_build_helper.subsitude_variables(ret, op, True)
         return ret
 
     def build_initial_guess(self, op: OptimizationProblem, initial_guess: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('initial_guess', initial_guess)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('initial_guess', initial_guess)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 
     def build_lbx(self, op: OptimizationProblem, lbx: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('lbx', lbx)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('lbx', lbx)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 
     def build_ubx(self, op: OptimizationProblem, ubx: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('ubx', ubx)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('ubx', ubx)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 
     def build_lbg(self, op: OptimizationProblem, lbg: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('lbg', lbg)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('lbg', lbg)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 
     def build_ubg(self, op: OptimizationProblem, ubg: casadi.SX):
-        ret = self.problem_build_helper.build_dense_matrix('ubg', ubg)
-        ret = self.subsitude_variables(ret, op)
+        ret = self.problem_build_helper.build_matrix('ubg', ubg)
+        ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret

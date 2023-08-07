@@ -107,18 +107,24 @@ class ProblemBuildHelper:
 
         return ret
 
-    def build_matrix_values_dense(self, name, vals: [str]):
+    def build_matrix_values_dense(self, name, vals: [str], as_vector):
         ret = ''
         row = 0
         column = 0
         temp_name = name + self.temporary
         for v, val in enumerate(vals):
             original_val = val
-            val = val.replace('[','').replace(']','').replace('\n','').replace(' ', '')
-            ret += f"{name}[{row},{column}] = {val};\n"
+            val = val.replace('[','').replace(']','').replace('\n','').replace(' ', '').replace('00', '0')
+            if as_vector:
+                ret += f"{name}[{column}] = {val};\n"
+            else:
+                ret += f"{name}[{row},{column}] = {val};\n"
+
             column += 1
+
             if ']' in original_val:
-                column = 0
+                if not as_vector:
+                    column = 0
                 row += 1
 
         ret = ret.replace("@", temp_name)
@@ -152,7 +158,7 @@ class ProblemBuildHelper:
             definitions = [e for e in smat if e[0] == '@']
             values = [e for e in smat if e[0] != '@']
             ret = self.build_matrix_definitions(name, definitions)
-            ret += self.build_matrix_values_dense(name, values)
+            ret += self.build_matrix_values_dense(name, values, as_vector)
 
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
@@ -204,16 +210,45 @@ class ProblemBuildHelper:
         ret = self.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
         return ret
 
-    def build_vectormatrix_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, dense=False):
-        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, dense=dense)
+    def build_vectormatrix_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False):
+        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, as_vector=as_vector, dense=dense)
         ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         return ret
 
-    def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, dense=False):
-        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, dense)
+    def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False):
+        ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, as_vector=as_vector, dense=dense)
         ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = ret.replace("(0,0)", "")
+        ret = ret.replace("(0)", "")
 
         ret_split = ret.split("=")
         val_name = ret_split[0].split("[")[0].replace(" ", "")
         ret = val_name + " = " + ret_split[1]
+        return ret
+
+    def build_ipopt_index(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX):
+        ret = ""
+        smat = self.SX_sparse_str(vector_matrix_casadi_formulation)
+        value_lines = [e for e in smat if e[0] == '(']
+        for l, line in enumerate(value_lines):
+            index_str = line.split("->")[0].replace("(", "").replace(")", "").split(",")
+            row = int(index_str[0])
+            column = int(index_str[1])
+            ret += f"        iRow[{l}] = {row};\n"
+            ret += f"        jCol[{l}] = {column};\n"
+        return ret
+
+    def build_ipopt_values(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX):
+        # vector_matrix_casadi_formulation = casadi.reshape(vector_matrix_casadi_formulation, (-1, 1))
+        # smat = self.SX_dense_str(vector_matrix_casadi_formulation)
+        # define_str = [e for e in smat if e[0] == '@']
+        # ret = self.build_matrix_definitions("values", define_str)
+
+        # value_lines = [e for e in smat if e[0] == '(']
+        ret = self.build_matrix("values", vector_matrix_casadi_formulation, True, False) 
+        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        
+        lines = ret.split('\n')
+        indendet_lines = ["    " + l for l in lines if l != '']
+        ret = "\n".join(indendet_lines)
         return ret
