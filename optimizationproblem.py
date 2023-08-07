@@ -95,7 +95,7 @@ class OptimizationProblem:
         return fn(initial_guess, problem_parameters)
 
     def build_lagrangian(self):
-        self.lagrangian = self.objective_hessian
+        self.lagrangian = self.objective
         self.lambdas = SX.sym("lamg", self.constraints.n_constraints, 1)
         for i in range(self.constraints.n_constraints):
             self.lagrangian += self.lambdas[i] * self.constraints.equations_flat()[i]

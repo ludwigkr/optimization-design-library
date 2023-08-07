@@ -3,6 +3,10 @@
 #define HAVE_STDDEF_H
 #include <IpTNLP.hpp>
 
+struct scenario_parameter;
+
+struct problem_parameter;
+
 using namespace Ipopt;
 
 class ProblemFormulation: public TNLP {
@@ -23,7 +27,12 @@ public:
     Number parameter[N_PARAMS] = {};
     Number initial_guess[N_XOPTS] = {};
 
+    scenario_parameter *scenario = nullptr;
+    problem_parameter *prob_param = nullptr;
+
 private:
-    MyNLP(const MyNLP &);
-    MyNLP &operator=(const MyNLP &);
+    ProblemFormulation(const ProblemFormulation &);
+    ProblemFormulation &operator=(const ProblemFormulation &);
+
+    Number sq(Number x) { return x * x;};
 };
