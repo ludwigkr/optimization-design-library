@@ -25,10 +25,12 @@ class IpoptBuilder:
 
             n_xopts = op.optvars.n_vars
             n_constraints = op.constraints.n_constraints
+            n_params = op.problem_parameters.n_vars
             class_name = self.problem_build_helper.class_name(op.name)
             header = header.replace("N_DIMS_H", str(n_xopts**2))
             header = header.replace("N_DIMS_A", str(n_xopts*n_constraints))
             header = header.replace("N_XOPTS", str(n_xopts))
+            header = header.replace("N_PARAMS", str(n_params))
             header = header.replace("N_CONSTRAINTS", str(n_constraints))
             header = header.replace("Problem", class_name)
             header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameters))
@@ -51,6 +53,8 @@ class IpoptBuilder:
 
         source = source.replace("solvertemplate", op.name +"_quad_opti_qpoases")
         class_name = self.problem_build_helper.class_name(op.name)
+
+        source = source.replace("formulation", op.name)
         source = source.replace('#include "problem_index.h"', '#include "' + str(op.name) + '_index.h"')
         source = source.replace("Problem", class_name)
         source = source.replace("N_XOPTS + N_CONSTRAINTS", str(n_xopts + n_constraints))
@@ -58,12 +62,17 @@ class IpoptBuilder:
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
         source = source.replace("N_PARAMS", str(op.problem_parameters.n_vars))
 
+        lagrangian_hessian_nnz = op.lagrangian_hessian.nnz()
+        source = source.replace("LAGRANGE_HESSIAN_NNZ", str(lagrangian_hessian_nnz))
+
         source = source.replace("/* OBJECTIVE PLACEHOLDER*/", self.problem_build_helper.build_scalar_for_optimizer_formulation(op, "obj_value", op.objective))
         source = source.replace("    /* OBJECTIVE_JACOBIAN PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "grad_f", op.objective_jacobian.T, as_vector=True, dense=True))
 
         constraint_jacobian = casadi.jacobian(op.constraints.equations_flat(), op.optvars.unpacked())
         source = source.replace("        /* CONSTRAINTS_JACOBIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, constraint_jacobian))
         source = source.replace("        /* CONSTRAINTS_JACOBIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, constraint_jacobian))
+        constraint_jacobian_nnz = constraint_jacobian.nnz()
+        source = source.replace("CONSTRAINTS_JACOBIAN_NNZ", str(constraint_jacobian_nnz))
 
 
         source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, op.lagrangian_hessian))
@@ -97,7 +106,7 @@ class IpoptBuilder:
         source = source.replace("    /* CONSTRAINT_DERIVATIVES PLACEHOLDER*/", dconstr)
 
         parameters = self.build_parameters(op, op.problem_parameters.variables_flat())
-        source = source.replace("    /* PARAMS PLACEHOLDER*/", parameters)
+        source = source.replace("    /* PARAMS PLACEHOLDER*/", parameters).replace("parameters", "parameter")
 
         initial_guess = self.build_initial_guess(op, op.fn_initial_guess.call())
         source = source.replace("    /* INITIAL_GUESS PLACEHOLDER*/", initial_guess)
