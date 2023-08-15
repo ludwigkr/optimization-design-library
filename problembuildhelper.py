@@ -43,7 +43,8 @@ class ProblemBuildHelper:
         for vi, v in enumerate(var.variables):
             variable_structure += "        " + var.names[vi] + "(_" + var.names[vi] + "),\n"
         variable_structure = variable_structure[:-2]
-        variable_structure += "{}\n\n"
+        variable_structure += "{}\n\n    "
+        variable_structure += name+"(){}\n\n"
 
         variable_structure += "};"
         return variable_structure

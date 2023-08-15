@@ -7,7 +7,7 @@
 #define HAVE_STDDEF_H
 #include <IpIpoptApplication.hpp>
 #include <IpSolveStatistics.hpp>
-#include "MyNLP.hpp"
+#include "ProblemFormulation.h"
 #undef HAVE_CSTDDEF_H
 
 #include <iostream>
@@ -15,8 +15,7 @@
 using namespace Ipopt;
 
 int main(int, char **) {
-    // Create an instance of your nlp...
-    SmartPtr<TNLP> mynlp = new MyNLP();
+    SmartPtr<TNLP> mynlp = new ProblemFormulation();
 
     // Create an instance of the IpoptApplication
     //
