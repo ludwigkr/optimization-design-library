@@ -51,5 +51,19 @@ class TestCasadi(unittest.TestCase):
         self.assertTrue(f.n_out() == 1)
         res = f()
 
+    def test_symetric(self):
+        X = casadi.SX.sym("X", 2, 1)
+        mat = casadi.SX.sym("mat", 2, 2)
+
+        with self.subTest("symetric"):
+            mat[0, 0] = X[0]
+            mat[1, 0] = X[0]*X[1]
+            mat[0, 1] = X[1]*X[0]
+            mat[1, 1] = X[1]
+            self.assertTrue(str(mat[1, 0]) == str(mat[0, 1]))
+            self.assertTrue(str(mat) == str(mat.T))
+
+
+
 if __name__ == '__main__':
     unittest.main()
