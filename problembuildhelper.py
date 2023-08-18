@@ -156,8 +156,8 @@ class ProblemBuildHelper:
 
         else:
             smat = self.SX_dense_str(mat)
-            definitions = [e for e in smat if e[0] == '@']
-            values = [e for e in smat if e[0] != '@']
+            definitions = [e for e in smat if e[0] == '@' or e[0:2]==' @']
+            values = [e for e in smat if e[0] != '@' and e[0:2] != ' @']
             ret = self.build_matrix_definitions(name, definitions)
             ret += self.build_matrix_values_dense(name, values, as_vector)
 
@@ -246,7 +246,7 @@ class ProblemBuildHelper:
         # ret = self.build_matrix_definitions("values", define_str)
 
         # value_lines = [e for e in smat if e[0] == '(']
-        ret = self.build_matrix("values", vector_matrix_casadi_formulation, True, False) 
+        ret = self.build_matrix("values", casadi.reshape(vector_matrix_casadi_formulation, (-1,1)), True, False) 
         ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         
         lines = ret.split('\n')
