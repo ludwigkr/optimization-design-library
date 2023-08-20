@@ -108,7 +108,7 @@ class IpoptBuilder:
         parameters = self.build_parameters(op, op.problem_parameters.variables_flat())
         source = source.replace("    /* PARAMS PLACEHOLDER*/", parameters).replace("parameters", "parameter")
 
-        initial_guess = self.build_initial_guess(op, op.fn_initial_guess.call())
+        initial_guess = self.build_initial_guess(op, op.fn_initial_guess.call(), "x")
         source = source.replace("    /* INITIAL_GUESS PLACEHOLDER*/", initial_guess)
 
         lbx = self.build_lbx(op, op.fn_lbx.call())
@@ -182,8 +182,8 @@ class IpoptBuilder:
         ret = self.problem_build_helper.subsitude_variables(ret, op, True)
         return ret
 
-    def build_initial_guess(self, op: OptimizationProblem, initial_guess: casadi.SX):
-        ret = self.problem_build_helper.build_matrix('initial_guess', initial_guess)
+    def build_initial_guess(self, op: OptimizationProblem, initial_guess: casadi.SX, var_name='initial_guess'):
+        ret = self.problem_build_helper.build_matrix(var_name, initial_guess)
         ret = self.problem_build_helper.subsitude_variables(ret, op)
         return ret
 

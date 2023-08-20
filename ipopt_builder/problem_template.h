@@ -13,7 +13,10 @@ using namespace Ipopt;
 
 class ProblemFormulation: public TNLP {
 public:
-    ProblemFormulation() {};
+    ProblemFormulation(scenario_parameter *s, problem_parameter *p) {
+        scenario = s;
+        prob_param = p;
+    };
     virtual ~ProblemFormulation() {};
 
     virtual bool get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style);
@@ -26,14 +29,8 @@ public:
     virtual bool eval_h(Index n, const Number *x, bool new_x, Number obj_factor, Index m, const Number *lambda, bool new_lambda, Index nele_hess, Index *iRow, Index *jCol, Number *values);
     virtual void finalize_solution(SolverReturn status, Index n, const Number *x, const Number *z_L, const Number *z_U, Index m, const Number *g, const Number *lambda, Number obj_value, const IpoptData *ip_data, IpoptCalculatedQuantities *ip_cq);
 
-    void update_initial_guess();
-    void update_parameter();
-
-    Number parameter[N_PARAMS] = {};
-    Number initial_guess[N_XOPTS] = {};
-
-    scenario_parameter *scenario = nullptr;
-    problem_parameter *prob_param = nullptr;
+    scenario_parameter *scenario;
+    problem_parameter *prob_param;
 
 private:
 

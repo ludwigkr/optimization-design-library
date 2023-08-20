@@ -70,10 +70,7 @@ bool ProblemFormulation::get_starting_point(Index n, bool init_x, Number *x, boo
     assert(init_z == false);
     assert(init_lambda == false);
 
-
-    for (int i = 0; i < N_XOPTS; i++) {
-        x[i] = initial_guess[i];
-    }
+    /* INITIAL_GUESS PLACEHOLDER*/
 
     return true;
 }
@@ -83,7 +80,6 @@ bool ProblemFormulation::eval_f(Index n, const Number *x, bool new_x, Number &ob
     assert(scenario != nullptr);
     assert(prob_param != nullptr);
     const Number *xopt = x;
-    const Number *param = parameter;
     // Number x2 = x[1];
 
     // obj_value = -(x[1] - 2.0) * (x[1] - 2.0);
@@ -97,7 +93,6 @@ bool ProblemFormulation::eval_grad_f(Index n, const Number *x, bool new_x, Numbe
     assert(prob_param != nullptr);
     // return the gradient of the objective function grad_{x} f(x)
     const Number *xopt = x;
-    const Number *param = parameter;
 
     // grad_f[0] = 0.0;
     // grad_f[1] = -2.0 * (x[1] - 2.0);
@@ -111,7 +106,6 @@ bool ProblemFormulation::eval_g(Index n, const Number *x, bool new_x, Index m, N
     assert(prob_param != nullptr);
     // return the value of the constraints: g(x)
     const Number *xopt = x;
-    const Number *param = parameter;
 
     // g[0] = -(x1 * x1 + x2 - 1.0);
     /* CONSTRAINTS PLACEHOLDER*/
@@ -123,7 +117,6 @@ bool ProblemFormulation::eval_jac_g(Index n, const Number *x, bool new_x, Index 
     assert(scenario != nullptr);
     assert(prob_param != nullptr);
     const Number *xopt = x;
-    const Number *param = parameter;
     if (values == NULL) {
         // return the structure of the jacobian of the constraints
 
@@ -171,7 +164,6 @@ bool ProblemFormulation::eval_h(Index n, const Number *x, bool new_x, Number obj
         // Note: off-diagonal elements are zero for this problem
     } else {
         const Number *xopt = x;
-        const Number *param = parameter;
         const Number *lamg = lambda;
 
         // return the values
@@ -195,11 +187,3 @@ void ProblemFormulation::finalize_solution(SolverReturn status, Index n, const N
     // we currently do nothing here.
 }
 
-void ProblemFormulation::update_initial_guess() {
-
-    /* INITIAL_GUESS PLACEHOLDER*/
-}
-void ProblemFormulation::update_parameter() {
-
-    /* PARAMS PLACEHOLDER*/
-}
