@@ -65,8 +65,8 @@ class IpoptBuilder:
         lagrangian_hessian_nnz = op.lagrangian_hessian.nnz()
         source = source.replace("LAGRANGE_HESSIAN_NNZ", str(lagrangian_hessian_nnz))
 
-        source = source.replace("/* OBJECTIVE PLACEHOLDER*/", self.problem_build_helper.build_scalar_for_optimizer_formulation(op, "obj_value", op.objective))
-        source = source.replace("    /* OBJECTIVE_JACOBIAN PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "grad_f", op.objective_jacobian.T, as_vector=True, dense=True))
+        source = source.replace("/* OBJECTIVE PLACEHOLDER*/", self.problem_build_helper.build_scalar_for_optimizer_formulation(op, "obj_value", op.objective, prob_param_as_struct=True))
+        source = source.replace("    /* OBJECTIVE_JACOBIAN PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "grad_f", op.objective_jacobian.T, as_vector=True, dense=True, prob_param_as_struct=True))
 
         constraint_jacobian = casadi.jacobian(op.constraints.equations_flat(), op.optvars.unpacked())
         source = source.replace("        /* CONSTRAINTS_JACOBIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, constraint_jacobian))
@@ -97,7 +97,7 @@ class IpoptBuilder:
         bA = self.build_bA(op, qoe.cx0minusdcx0)
         source = source.replace("    /* UPDATE bA PLACEHOLDER*/", bA)
 
-        source = source.replace("    /* CONSTRAINTS PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "g", op.constraints.equations_flat(), as_vector=True, dense=True))
+        source = source.replace("    /* CONSTRAINTS PLACEHOLDER*/", self.problem_build_helper.build_vectormatrix_for_optimizer_formulation(op, "g", op.constraints.equations_flat(), as_vector=True, dense=True, prob_param_as_struct=True))
 
         H = self.build_updateH(op, qoe.objective_hessian)
         source = source.replace("    /* UPDATE H PLACEHOLDER*/", H)
