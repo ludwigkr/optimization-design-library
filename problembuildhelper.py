@@ -29,22 +29,23 @@ class ProblemBuildHelper:
                 variable_structure += "    Eigen::VectorXd " + var.names[vi] + ";\n"
 
         # constructor header:
-        variable_structure += "\n    " + name + "("
-        for vi, v in enumerate(var.variables):
-            if v.size1() == 1 and v.size2() == 1:
-                variable_structure += "float _" + var.names[vi] + ", "
-            else:
-                variable_structure += "Eigen::VectorXd _" + var.names[vi] + ", "
+        if len(var.variables) > 0:
+            variable_structure += "\n    " + name + "("
+            for vi, v in enumerate(var.variables):
+                if v.size1() == 1 and v.size2() == 1:
+                    variable_structure += "float _" + var.names[vi] + ", "
+                else:
+                    variable_structure += "Eigen::VectorXd _" + var.names[vi] + ", "
 
-        if variable_structure[-2:] == ', ':
+            if variable_structure[-2:] == ', ':
+                variable_structure = variable_structure[:-2]
+
+            variable_structure += "):\n"
+            for vi, v in enumerate(var.variables):
+                variable_structure += "        " + var.names[vi] + "(_" + var.names[vi] + "),\n"
             variable_structure = variable_structure[:-2]
-
-        variable_structure += "):\n"
-        for vi, v in enumerate(var.variables):
-            variable_structure += "        " + var.names[vi] + "(_" + var.names[vi] + "),\n"
-        variable_structure = variable_structure[:-2]
-        variable_structure += "{}\n\n    "
-        variable_structure += name+"(){}\n\n"
+            variable_structure += "{}\n\n    "
+            variable_structure += name+"(){}\n\n"
 
         variable_structure += "};"
         return variable_structure
@@ -239,6 +240,20 @@ class ProblemBuildHelper:
             ret += f"        jCol[{l}] = {column};\n"
         return ret
 
+    def correct_value_index_for_sparse_representation(self, formulation: str) -> str:
+
+        lines = formulation.split('\n');
+
+        idx = 0
+        for i, val in enumerate(lines):
+            line_parts = val.split(' = ')
+            if line_parts[0][0:10] == '    values':
+                lines[i] = lines[i].replace(line_parts[0], f'    values[{idx}]')
+                idx += 1
+
+        ret = "\n".join(lines)
+        return ret
+
     def build_ipopt_values(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX):
         # vector_matrix_casadi_formulation = casadi.reshape(vector_matrix_casadi_formulation, (-1, 1))
         # smat = self.SX_dense_str(vector_matrix_casadi_formulation)
@@ -246,10 +261,14 @@ class ProblemBuildHelper:
         # ret = self.build_matrix_definitions("values", define_str)
 
         # value_lines = [e for e in smat if e[0] == '(']
+        print(vector_matrix_casadi_formulation)
         ret = self.build_matrix("values", casadi.reshape(vector_matrix_casadi_formulation, (-1,1)), True, False) 
+        ret = self.correct_value_index_for_sparse_representation(ret)
         ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
         
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
         ret = "\n".join(indendet_lines)
         return ret
+
+
