@@ -212,14 +212,18 @@ class ProblemBuildHelper:
         ret = self.substitute_variable_in_struct(ret, 'scenario', '->', op.scenario_parameters)
         return ret
 
-    def build_vectormatrix_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False):
+    def build_vectormatrix_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False, prob_param_as_struct=False):
         ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, as_vector=as_vector, dense=dense)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.subsitude_variables(ret, op, prob_param_as_struct=prob_param_as_struct)
+        if not prob_param_as_struct:
+            ret = ret.replace("prob_param", "param")
         return ret
 
-    def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False):
+    def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False, prob_param_as_struct=False):
         ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, as_vector=as_vector, dense=dense)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.subsitude_variables(ret, op, prob_param_as_struct=prob_param_as_struct)
+        if not prob_param_as_struct:
+            ret = ret.replace("prob_param", "param")
         ret = ret.replace("(0,0)", "")
         ret = ret.replace("(0)", "")
 
@@ -264,7 +268,7 @@ class ProblemBuildHelper:
         print(vector_matrix_casadi_formulation)
         ret = self.build_matrix("values", casadi.reshape(vector_matrix_casadi_formulation, (-1,1)), True, False) 
         ret = self.correct_value_index_for_sparse_representation(ret)
-        ret = self.subsitude_variables(ret, op).replace("prob_param", "param")
+        ret = self.subsitude_variables(ret, op, prob_param_as_struct=True)
         
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
