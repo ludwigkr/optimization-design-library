@@ -9,6 +9,7 @@ sys.path.append(local_folder_path + "../")
 from optimizationproblem import OptimizationProblem
 from qpelements import QuadraticOptimizerElements
 from problembuildhelper import ProblemBuildHelper
+from math_helper import symetric_based_on_numeric
 
 class IpoptBuilder:
     def __init__(self) -> None:
@@ -47,6 +48,16 @@ class IpoptBuilder:
     def build_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path: str) -> None:
         n_constraints = op.constraints.n_constraints
         n_xopts = op.optvars.n_vars
+        lagrange_hessian_quadratic = symetric_based_on_numeric(op.lagrangian_hessian, [op.optvars.unpacked(), op.problem_parameters.unpacked(), op.lambdas])
+        lagrange_hessian_zeros = 0
+        if lagrange_hessian_quadratic:
+            for row in range(op.lagrangian_hessian.size(1)):
+                for column in range(op.lagrangian_hessian.size(2)):
+                    if column > row:
+                        op.lagrangian_hessian[row, column] = 0
+                    if str(op.lagrangian_hessian[row, column]) == '0':
+                        lagrange_hessian_zeros += 1
+
 
         with open(local_folder_path + '/problem_template.cpp', 'r') as f:
             source = f.read();
@@ -62,7 +73,7 @@ class IpoptBuilder:
         source = source.replace("N_CONSTRAINTS", str(n_constraints))
         source = source.replace("N_PARAMS", str(op.problem_parameters.n_vars))
 
-        lagrangian_hessian_nnz = op.lagrangian_hessian.nnz()
+        lagrangian_hessian_nnz = op.lagrangian_hessian.size(1) * op.lagrangian_hessian.size(2) - lagrange_hessian_zeros
         source = source.replace("LAGRANGE_HESSIAN_NNZ", str(lagrangian_hessian_nnz))
 
         source = source.replace("/* OBJECTIVE PLACEHOLDER*/", self.problem_build_helper.build_scalar_for_optimizer_formulation(op, "obj_value", op.objective, prob_param_as_struct=True))
@@ -75,8 +86,8 @@ class IpoptBuilder:
         source = source.replace("CONSTRAINTS_JACOBIAN_NNZ", str(constraint_jacobian_nnz))
 
 
-        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, op.lagrangian_hessian))
-        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, op.lagrangian_hessian))
+        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, op.lagrangian_hessian, lagrange_hessian_quadratic))
+        source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, op.lagrangian_hessian, lagrange_hessian_quadratic))
         
 
         init_H = self.build_initH(op, qoe.objective_hessian)

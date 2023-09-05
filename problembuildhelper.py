@@ -232,16 +232,24 @@ class ProblemBuildHelper:
         ret = val_name + " = " + ret_split[1]
         return ret
 
-    def build_ipopt_index(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX):
+    def build_ipopt_index(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX, only_lower_triangular=False):
         ret = ""
         smat = self.SX_sparse_str(vector_matrix_casadi_formulation)
         value_lines = [e for e in smat if e[0] == '(']
+        line_index = 0
         for l, line in enumerate(value_lines):
             index_str = line.split("->")[0].replace("(", "").replace(")", "").split(",")
             row = int(index_str[0])
             column = int(index_str[1])
-            ret += f"        iRow[{l}] = {row};\n"
-            ret += f"        jCol[{l}] = {column};\n"
+            if not only_lower_triangular:
+                ret += f"        iRow[{l}] = {row};\n"
+                ret += f"        jCol[{l}] = {column};\n"
+            
+            elif only_lower_triangular and column <= row:
+                if str(vector_matrix_casadi_formulation[row, column]) != 0:
+                    ret += f"        iRow[{line_index}] = {row};\n"
+                    ret += f"        jCol[{line_index}] = {column};\n"
+                    line_index += 1
         return ret
 
     def correct_value_index_for_sparse_representation(self, formulation: str) -> str:
@@ -258,15 +266,29 @@ class ProblemBuildHelper:
         ret = "\n".join(lines)
         return ret
 
-    def build_ipopt_values(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX):
+    def build_ipopt_values(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX, only_lower_triangular=False):
         # vector_matrix_casadi_formulation = casadi.reshape(vector_matrix_casadi_formulation, (-1, 1))
         # smat = self.SX_dense_str(vector_matrix_casadi_formulation)
         # define_str = [e for e in smat if e[0] == '@']
         # ret = self.build_matrix_definitions("values", define_str)
 
         # value_lines = [e for e in smat if e[0] == '(']
-        print(vector_matrix_casadi_formulation)
-        ret = self.build_matrix("values", casadi.reshape(vector_matrix_casadi_formulation, (-1,1)), True, False) 
+        vector_matrix_casadi_formulation = casadi.reshape(vector_matrix_casadi_formulation, (-1,1))
+        nnz = 0
+        if only_lower_triangular:
+            for i in range(vector_matrix_casadi_formulation.size(1)):
+                if str(vector_matrix_casadi_formulation[i]) == "0":
+                    nnz += 1
+                
+            new_formulation = casadi.SX.sym('tmp', vector_matrix_casadi_formulation.size(1) - nnz, 1)
+            idx = 0
+            for i in range(vector_matrix_casadi_formulation.size(1)):
+                if str(vector_matrix_casadi_formulation[i]) != "0":
+                    new_formulation[idx] = vector_matrix_casadi_formulation[i]
+                    idx += 1
+            vector_matrix_casadi_formulation = new_formulation
+
+        ret = self.build_matrix("values", vector_matrix_casadi_formulation, True, False)
         ret = self.correct_value_index_for_sparse_representation(ret)
         ret = self.subsitude_variables(ret, op, prob_param_as_struct=True)
         
