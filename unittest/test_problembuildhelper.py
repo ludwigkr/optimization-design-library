@@ -45,6 +45,8 @@ class TestProblemBuildHelper(unittest.TestCase):
         X(_X),
         Y(_Y){}
 
+    problem_parameter(){}
+
 };"""
         self.assertTrue(target_output == output)
 

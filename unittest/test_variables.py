@@ -3,7 +3,8 @@
 import unittest
 import casadi
 import numpy as np
-
+import sys
+sys.path.append("..")
 from variables import Variables
 
 class TestVariables(unittest.TestCase):
