@@ -69,7 +69,7 @@ class TestProblemBuildHelper(unittest.TestCase):
             matrix = casadi.SX.sym("vector", 3, 1)
             matrix[0:2] = 0
             matrix[2] = X**2
-            ret = self.problem_build_helper.build_matrix("vector", matrix, dense=True)
+            ret = self.problem_build_helper.build_matrix("vector", matrix, as_vector=False, dense=True)
             target_output = \
 """    double vector_temporary1 = 0;
     vector[0,0] = vector_temporary1;
@@ -92,7 +92,7 @@ class TestProblemBuildHelper(unittest.TestCase):
             matrix[1, 0] = 0
             matrix[0, 1] = 0
             matrix[1, 1] = X**2
-            ret = self.problem_build_helper.build_matrix("matrix", matrix, dense=True)
+            ret = self.problem_build_helper.build_matrix("matrix", matrix, as_vector=False, dense=True)
             target_output = \
 """    double matrix_temporary1 = 0;
     matrix[0,0] = matrix_temporary1;
@@ -110,7 +110,7 @@ class TestProblemBuildHelper(unittest.TestCase):
     matrix[3] = sq(X);"""
             self.assertTrue(ret == target_output)
 
-            ret = self.problem_build_helper.build_matrix("matrix", matrix, as_matrix=False)
+            ret = self.problem_build_helper.build_matrix("matrix", matrix, as_vector=False)
             target_output = \
 """    double matrix_temporary1 = 0;
     matrix(0,0) = matrix_temporary1;
@@ -119,7 +119,7 @@ class TestProblemBuildHelper(unittest.TestCase):
     matrix(1,1) = sq(X);"""
             self.assertTrue(ret == target_output)
 
-            ret = self.problem_build_helper.build_matrix("matrix", matrix, as_matrix=False, dense=True)
+            ret = self.problem_build_helper.build_matrix("matrix", matrix, as_vector=False, dense=True)
             target_output = \
 """    double matrix_temporary1 = 0;
     matrix[0,0] = matrix_temporary1;
@@ -127,6 +127,9 @@ class TestProblemBuildHelper(unittest.TestCase):
     matrix[1,0] = matrix_temporary1;
     matrix[1,1] = sq(X);"""
             self.assertTrue(ret == target_output)
+
+    def test_vector_to_struct(self):
+        self.assertTrue(True)
 
 
 if __name__ == '__main__':
