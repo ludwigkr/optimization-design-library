@@ -9,6 +9,8 @@ struct scenario_parameter;
 
 struct problem_parameter;
 
+struct optimized_variable;
+
 using namespace Ipopt;
 
 class ProblemFormulation: public TNLP {
