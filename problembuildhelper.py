@@ -157,8 +157,8 @@ class ProblemBuildHelper:
 
         else:
             smat = self.SX_dense_str(mat)
-            definitions = [e for e in smat if e[0] == '@' or e[0:2]==' @']
-            values = [e for e in smat if e[0] != '@' and e[0:2] != ' @']
+            definitions = [e for e in smat if e[0] == '@' or (e[0:2]==' @' and ']' not in e)]
+            values = [e for e in smat if (e[0] != '@' and e[0:2] != ' @') or ']' in e]
             ret = self.build_matrix_definitions(name, definitions)
             ret += self.build_matrix_values_dense(name, values, as_vector)
 
@@ -297,4 +297,7 @@ class ProblemBuildHelper:
         ret = "\n".join(indendet_lines)
         return ret
 
+
+def build_vector_to_struct(struct_name: str, vars: Variables):
+    ret = ""
 
