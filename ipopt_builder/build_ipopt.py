@@ -16,13 +16,54 @@ class IpoptBuilder:
         self.problem_build_helper = ProblemBuildHelper()
 
     def build(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path:str) -> None:
-        self.builder_header(op, path)
-        self.build_source(op, qoe, path)
+        self.build_problem_header(op, path)
+        self.build_problem_source(op, qoe, path)
+        self.build_interface_header(op, path)
+        self.build_interface_source(op, path)
+
+    def build_interface_header(self, op: OptimizationProblem, path: str) -> None:
+            with open(local_folder_path + '/problem_interface.h', 'r') as f:
+                header = f.read()
+
+            class_name = self.problem_build_helper.class_name(op.name)
+            header = header.replace("Problem", class_name)
+            header = header.replace("problem_formulation", op.name+"_problem")
+
+            if path is None:
+                file_path = './' + op.name + "_interface.h"
+            else:
+                file_path = Path(path + '/' + op.name + "_interface.h").expanduser()
+            print(file_path)
+            with open(file_path, "w") as f:
+                f.write(header)
+
+    def build_interface_source(self, op: OptimizationProblem, path: str):
+            with open(local_folder_path + '/problem_interface.cpp', 'r') as f:
+                source = f.read()
+
+            class_name = self.problem_build_helper.class_name(op.name)
+            source = source.replace("Problem", class_name)
+            source = source.replace("problem_formulation", op.name)
+
+            if path is None:
+                file_path = './' + op.name + "_interface.cpp"
+            else:
+                file_path = Path(path + '/' + op.name + "_interface.cpp").expanduser()
+            print(file_path)
+            with open(file_path, "w") as f:
+                f.write(source)
 
 
-    def builder_header(self, op: OptimizationProblem, path: str) -> None:
+    def build_problem_header(self, op: OptimizationProblem, path: str) -> None:
             with open(local_folder_path + '/problem_template.h', 'r') as f:
                 header = f.read()
+            if path is None:
+                file_path = './' + op.name + "_problem_ipopt.h"
+            else:
+                file_path = Path(path + '/' + op.name + "_problem_ipopt.h").expanduser()
+            print(file_path)
+            with open(file_path, "w") as f:
+                f.write(header)
 
             n_xopts = op.optvars.n_vars
             n_constraints = op.constraints.n_constraints
@@ -46,7 +87,7 @@ class IpoptBuilder:
             with open(file_path, "w") as f:
                 f.write(header)
 
-    def build_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path: str) -> None:
+    def build_problem_source(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path: str) -> None:
         n_constraints = op.constraints.n_constraints
         n_xopts = op.optvars.n_vars
         lagrange_hessian_quadratic = symetric_based_on_numeric(op.lagrangian_hessian, [op.optvars.unpacked(), op.problem_parameters.unpacked(), op.lambdas])
