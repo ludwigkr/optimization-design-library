@@ -36,6 +36,7 @@ class IpoptBuilder:
             header = header.replace("Problem", class_name)
             header = header.replace("struct scenario_parameter;", self.problem_build_helper.variable_structure_definition("scenario_parameter", op.scenario_parameters))
             header = header.replace("struct problem_parameter;",  self.problem_build_helper.variable_structure_definition("problem_parameter", op.problem_parameters))
+            header = header.replace("struct optimized_variable;",  self.problem_build_helper.variable_structure_definition("optimized_variable", op.optvars))
 
             if path is None:
                 file_path = './' + op.name + "_problem_ipopt.h"
@@ -89,6 +90,7 @@ class IpoptBuilder:
         source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", self.problem_build_helper.build_ipopt_index(op, op.lagrangian_hessian, lagrange_hessian_quadratic))
         source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/", self.problem_build_helper.build_ipopt_values(op, op.lagrangian_hessian, lagrange_hessian_quadratic))
         
+        source = source.replace("    /*WRITE BACK SOLUTION PLACEHOLDER*/", self.problem_build_helper.build_struct_of_variable("xopt", op.optvars, pointer=True))
 
         init_H = self.build_initH(op, qoe.objective_hessian)
         source = source.replace("    /* INIT H PLACEHOLDER*/", init_H)

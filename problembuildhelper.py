@@ -45,7 +45,15 @@ class ProblemBuildHelper:
                 variable_structure += "        " + var.names[vi] + "(_" + var.names[vi] + "),\n"
             variable_structure = variable_structure[:-2]
             variable_structure += "{}\n\n    "
-            variable_structure += name+"(){}\n\n"
+            variable_structure += name+"(){\n"
+            for vi, v in enumerate(var.variables):
+                if v.size1() == 1 and v.size2() == 1:
+                    # variable_structure += "          float _" + var.names[vi] + ", "
+                    pass
+                else:
+                    variable_structure += f"          {var.names[vi]} = Eigen::VectorXd({v.size(1)*v.size(2)});\n" 
+            
+            variable_structure += "}\n\n"
 
         variable_structure += "};"
         return variable_structure
@@ -298,6 +306,29 @@ class ProblemBuildHelper:
         return ret
 
 
-def build_vector_to_struct(struct_name: str, vars: Variables):
-    ret = ""
+    def build_struct_of_variable(self, struct_name: str, vars: Variables, vector_name='x', pointer=False):
+        connector = "."
+        if pointer:
+            connector = "->"
+
+        ret = ""
+        idx = 0
+        for n, name in enumerate(vars.names):
+            if vars.variables[n].size(1)*vars.variables[n].size(2) == 1:
+                    ret += f"    {struct_name}{connector}{name} = {vector_name}[{idx}];\n"
+                    idx += 1
+            else:
+                if vars.variables[n].size(1) == 1 or vars.variables[n].size(2) == 1:
+                    if vars.variables[n].size(1) == 1:
+                        vars.variables[n] = vars.variables[n].T
+
+                    for v in range(vars.variables[n].size(1)):
+                        ret += f"    {struct_name}{connector}{name}[{v}] = {vector_name}[{idx}];\n"
+                        idx += 1
+                else:
+                    for v in range(vars.variables[n].size(1)):
+                        for w in range(vars.variables[n].size(2)):
+                            ret += f"    {struct_name}{connector}{name}[{v}, {w}] = {vector_name}[{idx}];\n"
+                            idx += 1
+        return ret
 

@@ -15,9 +15,10 @@ using namespace Ipopt;
 
 class ProblemFormulation: public TNLP {
 public:
-    ProblemFormulation(scenario_parameter *s, problem_parameter *p) {
+    ProblemFormulation(scenario_parameter *s, problem_parameter *p, optimized_variable *x) {
         scenario = s;
         prob_param = p;
+        xopt = x;
     };
     virtual ~ProblemFormulation() {};
 
@@ -33,6 +34,7 @@ public:
 
     scenario_parameter *scenario;
     problem_parameter *prob_param;
+    optimized_variable *xopt;
 
 private:
 
