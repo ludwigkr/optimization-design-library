@@ -45,7 +45,10 @@ class TestProblemBuildHelper(unittest.TestCase):
         X(_X),
         Y(_Y){}
 
-    problem_parameter(){}
+    problem_parameter(){
+          X = Eigen::VectorXd(2);
+          Y = Eigen::VectorXd(2);
+}
 
 };"""
         self.assertTrue(target_output == output)
@@ -128,8 +131,15 @@ class TestProblemBuildHelper(unittest.TestCase):
     matrix[1,1] = sq(X);"""
             self.assertTrue(ret == target_output)
 
-    def test_vector_to_struct(self):
-        self.assertTrue(True)
+    def test_build_vector_to_struct(self):
+        ret = self.problem_build_helper.build_struct_of_variable('optimization_variable', self.var)
+        target_output = \
+"""    optimization_variable.X[0] = x[0];
+    optimization_variable.X[1] = x[1];
+    optimization_variable.Y[0] = x[2];
+    optimization_variable.Y[1] = x[3];
+"""
+        self.assertTrue(ret == target_output)
 
 
 if __name__ == '__main__':
