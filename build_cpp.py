@@ -21,6 +21,10 @@ class CppBuilder:
 
     def build(self, op: OptimizationProblem, path=None) -> None:
         self.quadratic_elements = QuadraticOptimizerElements(op)
+
+        if path != None and not os.path.exists(path):
+            os.makedirs(path)
+
         if self.build_qpoases:
             qpoases_builder = QpoasesBuilder()
             qpoases_builder.build(op, self.quadratic_elements, path)
