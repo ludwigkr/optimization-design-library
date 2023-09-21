@@ -97,7 +97,7 @@ class IpoptBuilder:
                 for column in range(op.lagrangian_hessian.size(2)):
                     if column > row:
                         op.lagrangian_hessian[row, column] = 0
-                    if str(op.lagrangian_hessian[row, column]) == '0':
+                    if str(op.lagrangian_hessian[row, column]) == '0' or str(op.lagrangian_hessian[row, column]) == '00':
                         lagrange_hessian_zeros += 1
 
 
