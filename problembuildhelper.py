@@ -227,6 +227,12 @@ class ProblemBuildHelper:
             ret = ret.replace("prob_param", "param")
         return ret
 
+    def remove_matrix_information_lhs(self, exp: str) -> str:
+        exp_split = exp.split("=")
+        val_name = exp_split[0].split("[")[0].replace(" ", "")
+        exp = val_name + " = " + exp_split[1]
+        return exp
+
     def build_scalar_for_optimizer_formulation(self, op: OptimizationProblem, vectormatrix_name:str, vectormatrix_casadi_formulation:casadi.SX, as_vector=False, dense=False, prob_param_as_struct=False):
         ret = self.build_matrix(vectormatrix_name, vectormatrix_casadi_formulation, as_vector=as_vector, dense=dense)
         ret = self.subsitude_variables(ret, op, prob_param_as_struct=prob_param_as_struct)
@@ -235,9 +241,13 @@ class ProblemBuildHelper:
         ret = ret.replace("(0,0)", "")
         ret = ret.replace("(0)", "")
 
-        ret_split = ret.split("=")
-        val_name = ret_split[0].split("[")[0].replace(" ", "")
-        ret = val_name + " = " + ret_split[1]
+        lines = ret.split("\n")
+        if len(lines)>1:
+            lines[-1] = self.remove_matrix_information_lhs(lines[-1])
+            ret = "\n".join(lines)
+        else:
+            ret = self.remove_matrix_information_lhs(ret)
+
         return ret
 
     def build_ipopt_index(self, op: OptimizationProblem, vector_matrix_casadi_formulation: casadi.SX, only_lower_triangular=False):
