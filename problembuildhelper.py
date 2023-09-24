@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import casadi
-import numpy as np
+import re
 
 from variables import Variables
 from optimizationproblem import OptimizationProblem
@@ -51,8 +51,8 @@ class ProblemBuildHelper:
                     # variable_structure += "          float _" + var.names[vi] + ", "
                     pass
                 else:
-                    variable_structure += f"          {var.names[vi]} = Eigen::VectorXd({v.size(1)*v.size(2)});\n" 
-            
+                    variable_structure += f"          {var.names[vi]} = Eigen::VectorXd({v.size(1)*v.size(2)});\n"
+
             variable_structure += "}\n\n"
 
         variable_structure += "};"
@@ -177,15 +177,15 @@ class ProblemBuildHelper:
 
     def substitude_variable(self, exp: str, old_name: str, new_name: str, N: int, index_offset=0) -> str:
         if N == 1:
-            search_pattern = old_name
+            search_pattern = "(?!_\w+)" + old_name + "(?!_\w+)"
             replace_pattern = new_name + "[" + str(index_offset) + "]"
-            exp = exp.replace(search_pattern, replace_pattern)
+            exp = re.sub(search_pattern, replace_pattern, exp)
 
         else:
             for n in reversed(range(N)):
-                search_pattern = old_name + "_" + str(n)
+                search_pattern = "(?!_\w+)" + old_name + "_" + str(n)+ "(?!_\w+)"
                 replace_pattern = new_name + "[" + str(n + index_offset) + "]"
-                exp = exp.replace(search_pattern, replace_pattern)
+                exp = re.sub(search_pattern, replace_pattern, exp)
 
         return exp
 
@@ -194,13 +194,13 @@ class ProblemBuildHelper:
             N = vars.variables[v].size1() * vars.variables[v].size2()
             if N > 1:
                 for n in reversed(range(N)):
-                    search_pattern = var + "_" + str(n)
+                    search_pattern = "(?!_\w+)" + var + "_" + str(n)+ "(?!_\w+)"
                     replace_pattern = sturct_name + link_symbol + var + "[" + str(n) + "]"
-                    exp = exp.replace(search_pattern, replace_pattern)
+                    exp = re.sub(search_pattern, replace_pattern, exp)
             else:
-                search_pattern = var
+                search_pattern = "(?!_\w+)" + var + "(?!_\w+)"
                 replace_pattern = sturct_name + link_symbol + var
-                exp = exp.replace(search_pattern, replace_pattern)
+                exp = re.sub(search_pattern, replace_pattern, exp)
 
         return exp
 
@@ -252,7 +252,7 @@ class ProblemBuildHelper:
             if not only_lower_triangular:
                 ret += f"        iRow[{l}] = {row};\n"
                 ret += f"        jCol[{l}] = {column};\n"
-            
+
             elif only_lower_triangular and column <= row:
                 if str(vector_matrix_casadi_formulation[row, column]) != 0:
                     ret += f"        iRow[{line_index}] = {row};\n"
@@ -287,7 +287,7 @@ class ProblemBuildHelper:
             for i in range(vector_matrix_casadi_formulation.size(1)):
                 if str(vector_matrix_casadi_formulation[i]) == "0":
                     nnz += 1
-                
+
             new_formulation = casadi.SX.sym('tmp', vector_matrix_casadi_formulation.size(1) - nnz, 1)
             idx = 0
             for i in range(vector_matrix_casadi_formulation.size(1)):
@@ -299,7 +299,7 @@ class ProblemBuildHelper:
         ret = self.build_matrix("values", vector_matrix_casadi_formulation, True, False)
         ret = self.correct_value_index_for_sparse_representation(ret)
         ret = self.subsitude_variables(ret, op, prob_param_as_struct=True)
-        
+
         lines = ret.split('\n')
         indendet_lines = ["    " + l for l in lines if l != '']
         ret = "\n".join(indendet_lines)
@@ -331,4 +331,3 @@ class ProblemBuildHelper:
                             ret += f"    {struct_name}{connector}{name}[{v}, {w}] = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
-
