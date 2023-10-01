@@ -1,5 +1,6 @@
 from optimizationproblem import OptimizationProblem, Variables
 
+import json
 import os
 import sys
 import casadi
@@ -195,3 +196,28 @@ def write_formulation(op: OptimizationProblem, scenario_parameters, parameters=N
     file = "ocp_" + op.name + ".org"
     with open(file, "w") as f:
         f.write(formulation_text)
+
+class TestCaseExporter():
+    def __init__(self):
+        self.export = '{"cases":['
+        self.n = 0
+    
+    def add_case(self, ocp: OptimizationProblem, scenario, prob_param, result) -> str:
+        if self.n > 0:
+            self.export += ","
+        ret = '{"scenario": ' + str(ocp.scenario_parameters.packed(scenario)) + ','
+        ret += '"prob_param": ' + str(ocp.problem_parameters.packed(prob_param)) + ','
+        ret += '"xopt": ' + str(ocp.optvars.packed(result['x'])) + '}'
+        self.export += ret
+        self.n += 1
+
+        return ret
+
+    def save(self, path: str=None):
+        if path == None:
+            path = "./test-cases.json"
+
+        self.export += "]}"
+
+        with open(path, "w") as f:
+            f.write(json.dumps(json.loads(self.export), indent=2))
