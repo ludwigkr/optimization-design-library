@@ -65,4 +65,4 @@ if __name__ == "__main__":
     case_exporter.save("./tests_min_nlp_with_params.json")
 
     cppbuilder = CppBuilder()
-    cppbuilder.build(ocp)
+    cppbuilder.build(ocp, "./cpp")
