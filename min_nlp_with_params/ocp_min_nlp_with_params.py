@@ -60,5 +60,9 @@ if __name__ == "__main__":
     # problem_parameters = ocp.problem_parameters.unpacked()
     optimizationsolver.write_formulation(ocp, scenario, problem_parameters, result)
 
+    case_exporter = optimizationsolver.TestCaseExporter()
+    case_exporter.add_case(ocp, scenario, problem_parameters, result)
+    case_exporter.save("./tests_min_nlp_with_params.json")
+
     cppbuilder = CppBuilder()
     cppbuilder.build(ocp)
