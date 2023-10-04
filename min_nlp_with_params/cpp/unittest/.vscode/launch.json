@@ -5,7 +5,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_mixer_control",
+            "program": "${workspaceFolder}/build/min_nlp_with_params_test",
             "args": [],
             "stopAtEntry": false,
             "preLaunchTask": "make",

@@ -12,6 +12,9 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/../**",
+                "${workspaceFolder}/../../../cpp**",
+                "${workspaceFolder}/../../../cpp/json**",
+                "${workspaceFolder}/../../../cpp/json/**",
                 "/usr/include/**",
                 "/usr/include/glib-2.0/**",
                 "/usr/include/gstreamer-1.0/**",

@@ -11,6 +11,12 @@ struct problem_parameter;
 
 struct optimized_variable;
 
+std::tuple<std::map<std::string, size_t>, std::map<std::string, size_t>, std::map<std::string, size_t>> mappers();
+
+std::ostream& operator<<(std::ostream& os, const scenario_parameter& s);
+std::ostream& operator<<(std::ostream& os, const problem_parameter& p);
+std::ostream& operator<<(std::ostream& os, const optimized_variable& o);
+
 using namespace Ipopt;
 
 class ProblemFormulation: public TNLP {

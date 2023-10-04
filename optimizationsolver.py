@@ -197,20 +197,36 @@ def write_formulation(op: OptimizationProblem, scenario_parameters, parameters=N
     with open(file, "w") as f:
         f.write(formulation_text)
 
+
 class TestCaseExporter():
     def __init__(self):
         self.export = '{"cases":['
         self.n = 0
+
     
     def add_case(self, ocp: OptimizationProblem, scenario, prob_param, result) -> str:
         if self.n > 0:
             self.export += ","
-        ret = '{"scenario": ' + str(ocp.scenario_parameters.packed(scenario)) + ','
-        ret += '"prob_param": ' + str(ocp.problem_parameters.packed(prob_param)) + ','
-        ret += '"xopt": ' + str(ocp.optvars.packed(result['x'])) + '}'
+        ret = '{"scenario": ' + self.tojson(ocp.scenario_parameters, ocp.scenario_parameters.packed(scenario)) + ','
+        ret += '"prob_param": ' + self.tojson(ocp.problem_parameters, ocp.problem_parameters.packed(prob_param)) + ','
+        ret += '"xopt": ' + self.tojson(ocp.optvars, ocp.optvars.packed(result['x'])) + '}'
         self.export += ret
         self.n += 1
 
+        return ret
+    
+    def tojson(self, var:Variables, val: casadi.DM) -> str:
+        ret = "{"
+        if len(var.names) == 0:
+            ret += ","
+        elif len(var.names) == 1:
+            ret += f'"{var.names[0]}": {val},'
+        elif len(var.names) > 1:
+            for i, name in enumerate(var.names):
+                ret += f'"{name}": {val[i]},'
+
+        ret = ret[:-1]
+        ret += "}"
         return ret
 
     def save(self, path: str=None):
@@ -221,3 +237,4 @@ class TestCaseExporter():
 
         with open(path, "w") as f:
             f.write(json.dumps(json.loads(self.export), indent=2))
+            # f.write(self.export)
