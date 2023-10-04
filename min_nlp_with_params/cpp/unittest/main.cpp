@@ -1,9 +1,6 @@
 #include "../min_nlp_with_params_interface.h"
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& os, const optimized_variable& o) {
-    return os << "X: " << o.X.transpose();
-}
 
 int main(int ac, char **av) {
     Eigen::VectorXd SP = Eigen::VectorXd(2);

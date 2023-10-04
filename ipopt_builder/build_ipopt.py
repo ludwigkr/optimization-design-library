@@ -177,6 +177,12 @@ class IpoptBuilder:
         ubg = self.build_ubg(op, op.fn_ubg.call())
         source = source.replace("    /* UBG PLACEHOLDER*/", ubg)
 
+        mappers = self.problem_build_helper.build_mappers(op)
+        source = source.replace("/* MAPPERS PLACEHOLDER*/", mappers)
+
+        osstreams = self.problem_build_helper.build_osstreams(op)
+        source = source.replace("/* OS STREAM PLACEHOLDER*/", osstreams)
+
         if path is None:
             file_path = './' + op.name + "_problem_ipopt.cpp"
         else:

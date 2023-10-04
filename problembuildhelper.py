@@ -341,3 +341,58 @@ class ProblemBuildHelper:
                             ret += f"    {struct_name}{connector}{name}[{v}, {w}] = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
+    
+    def build_osstreams(self, op:OptimizationProblem) -> str:
+        ret = "std::ostream& operator<<(std::ostream& os, const scenario_parameter& s) {\n"
+        ret += '   return os << "{ scenario - '
+        for name in op.scenario_parameters.names:
+            ret += f'{name}: " << s.{name} << ", "'
+
+        ret = ret[:-4]
+        ret += ' " };";\n'
+        ret += "};\n\n"
+
+        ret += "std::ostream& operator<<(std::ostream& os, const problem_parameter& p) {\n"
+        ret += '   return os << "{ prob_param - '
+        for name in op.problem_parameters.names:
+            ret += f'{name}: " << p.{name} << ", "'
+
+        ret = ret[:-4]
+        ret += ' " };";\n'
+        ret += "};\n\n"
+
+        ret += "std::ostream& operator<<(std::ostream& os, const optimized_variable& o) {\n"
+        ret += '   return os << "{ xopt - '
+        for name in op.optvars.names:
+            ret += f'{name}: " << o.{name} << ", "'
+
+        ret = ret[:-4]
+        ret += ' " };";\n'
+        ret += "};\n\n"
+
+        return ret
+
+    
+    def build_mappers(self, op:OptimizationProblem) -> str:
+
+        ret = "std::tuple<std::map<std::string, size_t>, std::map<std::string, size_t>, std::map<std::string, size_t>> mappers(){\n"
+        ret += "    std::map<std::string, size_t> map_scenario;\n"
+        ret += "    std::map<std::string, size_t> map_prob_param;\n"
+        ret += "    std::map<std::string, size_t> map_xopt;\n\n"
+
+
+        for name in op.scenario_parameters.names:
+            ret += f'    map_scenario["{name}"] = offsetof(scenario_parameter, {name});\n'
+        ret += "\n"
+
+        for name in op.problem_parameters.names:
+            ret += f'    map_prob_param["{name}"] = offsetof(problem_parameter, {name});\n'
+        ret += "\n"
+
+        for name in op.optvars.names:
+            ret += f'    map_xopt["{name}"] = offsetof(optimized_variable, {name});\n'
+        ret += "\n"
+        
+        ret += "    return std::tuple(map_scenario, map_prob_param, map_xopt);\n"
+        ret += "};"
+        return ret
