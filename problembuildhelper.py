@@ -346,7 +346,10 @@ class ProblemBuildHelper:
         ret = "std::ostream& operator<<(std::ostream& os, const scenario_parameter& s) {\n"
         ret += '   return os << "{ scenario - '
         for name in op.scenario_parameters.names:
-            ret += f'{name}: " << s.{name} << ", "'
+            if len(op.scenario_parameters.idxs[name]) > 1:
+                ret += f'{name}: " << s.{name}.transpose() << ", "'
+            else:
+                ret += f'{name}: " << s.{name} << ", "'
 
         ret = ret[:-4]
         ret += ' " };";\n'
@@ -355,7 +358,10 @@ class ProblemBuildHelper:
         ret += "std::ostream& operator<<(std::ostream& os, const problem_parameter& p) {\n"
         ret += '   return os << "{ prob_param - '
         for name in op.problem_parameters.names:
-            ret += f'{name}: " << p.{name} << ", "'
+            if len(op.problem_parameters.idxs[name]) > 1:
+                ret += f'{name}: " << p.{name}.transpose() << ", "'
+            else:
+                ret += f'{name}: " << p.{name} << ", "'
 
         ret = ret[:-4]
         ret += ' " };";\n'
@@ -364,7 +370,10 @@ class ProblemBuildHelper:
         ret += "std::ostream& operator<<(std::ostream& os, const optimized_variable& o) {\n"
         ret += '   return os << "{ xopt - '
         for name in op.optvars.names:
-            ret += f'{name}: " << o.{name} << ", "'
+            if len(op.optvars.idxs[name]) > 1:
+                ret += f'{name}: " << o.{name}.transpose() << ", "'
+            else:
+                ret += f'{name}: " << o.{name} << ", "'
 
         ret = ret[:-4]
         ret += ' " };";\n'
