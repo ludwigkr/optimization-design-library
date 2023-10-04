@@ -38,7 +38,9 @@ TEST(MinNlpWithParams, json) {
     problem_parameter prob_param;
     optimized_variable xref;
     case_importer.test_cast(0, &scenario, &prob_param, &xref);
-    std::cout << "scenario: " << scenario << std::endl;
+    std::cout  << scenario << std::endl;
+    std::cout  << prob_param << std::endl;
+    std::cout  << xref << std::endl;
     // std::ifstream f("./../../../tests_min_nlp_with_params.json");
     // json data = json::parse(f);
 
