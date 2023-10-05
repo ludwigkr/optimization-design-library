@@ -16,6 +16,7 @@ std::tuple<std::map<std::string, size_t>, std::map<std::string, size_t>, std::ma
 std::ostream& operator<<(std::ostream& os, const scenario_parameter& s);
 std::ostream& operator<<(std::ostream& os, const problem_parameter& p);
 std::ostream& operator<<(std::ostream& os, const optimized_variable& o);
+optimized_variable operator-(const optimized_variable& left, const optimized_variable& right);
 
 using namespace Ipopt;
 
