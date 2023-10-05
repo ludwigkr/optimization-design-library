@@ -10,6 +10,8 @@
 
 /* OS STREAM PLACEHOLDER*/
 
+/* OPERATORS PLACEHOLDER*/
+
 using namespace Ipopt;
 
 bool ProblemFormulation::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {

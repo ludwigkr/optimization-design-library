@@ -31,26 +31,22 @@ TEST(MinNlpWithParams, simpleTest) {
     CHECK((Xref - result.X).norm() < 1e5);
 }
 
-TEST(MinNlpWithParams, json) {
+TEST(MinNlpWithParams, pythonTests) {
     TestCaseImporter case_importer = TestCaseImporter("./../../../tests_min_nlp_with_params.json");
     case_importer.load_json();
+    uint N = case_importer.amount_cases();
+
     scenario_parameter scenario;
     problem_parameter prob_param;
     optimized_variable xref;
-    case_importer.test_cast(0, &scenario, &prob_param, &xref);
-    std::cout  << scenario << std::endl;
-    std::cout  << prob_param << std::endl;
-    std::cout  << xref << std::endl;
-    // std::ifstream f("./../../../tests_min_nlp_with_params.json");
-    // json data = json::parse(f);
-
-    // std::vector<float> s = data["cases"][0]["scenario"];
-    // Eigen::VectorXd scenario = Eigen::VectorXd(s.size());
-    // for(uint i=0; i<s.size(); i++) {
-    //     scenario[i] = s[i];
-    // }
-    // std::cout << "scenario: " << scenario.transpose() << std::endl;
-
-
-    CHECK(true);
+    MinNlpWithParams_Interface minnlpwithparams;
+    for (uint i=0; i<N; i++) {
+        case_importer.test_cast(0, &scenario, &prob_param, &xref);
+        minnlpwithparams.scenario = scenario;
+        minnlpwithparams.prob_param = prob_param;
+        
+        minnlpwithparams.solve();
+        optimized_variable result = minnlpwithparams.xopt;
+        CHECK( (result - xref).norm() < 1e-5);
+    }
 }

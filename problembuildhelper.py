@@ -53,7 +53,28 @@ class ProblemBuildHelper:
                 else:
                     variable_structure += f"          {var.names[vi]} = Eigen::VectorXd({v.size(1)*v.size(2)});\n"
 
-            variable_structure += "}\n\n"
+            variable_structure += "}\n"
+            
+            variable_structure += "    float norm() {\n"
+            variable_structure += "        float ret = 0;\n"
+            for vi, v in enumerate(var.variables):
+                if v.size1() == 1 and v.size2() == 1:
+                    variable_structure += f"        ret += powf({var.names[vi]}, 2);\n"
+                else:
+                    variable_structure += f"        ret += {var.names[vi]}.transpose() * {var.names[vi]};\n"
+
+            variable_structure += "        return sqrt(ret);\n"
+            variable_structure += "    }\n"
+
+
+
+            """
+    float norm(){
+        float ret = X.transpose() * X;
+        ret = sqrt(ret);
+        return ret;
+    }
+"""
 
         variable_structure += "};"
         return variable_structure
@@ -404,4 +425,14 @@ class ProblemBuildHelper:
         
         ret += "    return std::tuple(map_scenario, map_prob_param, map_xopt);\n"
         ret += "};"
+        return ret
+
+    def build_operators(self, op:OptimizationProblem) -> str:
+        ret = "optimized_variable operator-(const optimized_variable& left, const optimized_variable& right) {\n"
+        ret += "    optimized_variable ret;\n"
+        for name in op.optvars.names:
+                ret += f'    ret.{name} = left.{name} - right.{name};\n'
+        ret += "    return ret;\n"
+        ret += "};"
+
         return ret

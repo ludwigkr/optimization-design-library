@@ -183,6 +183,9 @@ class IpoptBuilder:
         osstreams = self.problem_build_helper.build_osstreams(op)
         source = source.replace("/* OS STREAM PLACEHOLDER*/", osstreams)
 
+        operators = self.problem_build_helper.build_operators(op)
+        source = source.replace("/* OPERATORS PLACEHOLDER*/", operators)
+
         if path is None:
             file_path = './' + op.name + "_problem_ipopt.cpp"
         else:
