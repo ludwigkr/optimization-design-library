@@ -362,43 +362,27 @@ class ProblemBuildHelper:
                             ret += f"    {struct_name}{connector}{name}[{v}, {w}] = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
+
+    def build_osstream(self, vars: Variables, vars_name: str):
+        ret = f"std::ostream& operator<<(std::ostream& os, const {vars_name}& s) " + "{\n"
+        ret += '   return os << "{'
+        for name in vars.names:
+            if len(vars.idxs[name]) > 1:
+                ret += f' {name}: " << s.{name}.transpose() << ", '
+            else:
+                ret += f' {name}: " << s.{name} << ", '
+
+        if len(vars.names) > 0:
+            ret = ret[:-3]
+            ret += ' "'
+        ret += ' }";\n'
+        ret += "};\n\n"
+        return ret
     
     def build_osstreams(self, op:OptimizationProblem) -> str:
-        ret = "std::ostream& operator<<(std::ostream& os, const scenario_parameter& s) {\n"
-        ret += '   return os << "{ scenario - '
-        for name in op.scenario_parameters.names:
-            if len(op.scenario_parameters.idxs[name]) > 1:
-                ret += f'{name}: " << s.{name}.transpose() << ", "'
-            else:
-                ret += f'{name}: " << s.{name} << ", "'
-
-        ret = ret[:-4]
-        ret += ' " };";\n'
-        ret += "};\n\n"
-
-        ret += "std::ostream& operator<<(std::ostream& os, const problem_parameter& p) {\n"
-        ret += '   return os << "{ prob_param - '
-        for name in op.problem_parameters.names:
-            if len(op.problem_parameters.idxs[name]) > 1:
-                ret += f'{name}: " << p.{name}.transpose() << ", "'
-            else:
-                ret += f'{name}: " << p.{name} << ", "'
-
-        ret = ret[:-4]
-        ret += ' " };";\n'
-        ret += "};\n\n"
-
-        ret += "std::ostream& operator<<(std::ostream& os, const optimized_variable& o) {\n"
-        ret += '   return os << "{ xopt - '
-        for name in op.optvars.names:
-            if len(op.optvars.idxs[name]) > 1:
-                ret += f'{name}: " << o.{name}.transpose() << ", "'
-            else:
-                ret += f'{name}: " << o.{name} << ", "'
-
-        ret = ret[:-4]
-        ret += ' " };";\n'
-        ret += "};\n\n"
+        ret = self.build_osstream(op.scenario_parameters, "scenario_parameter")
+        ret += self.build_osstream(op.problem_parameters, "problem_parameter")
+        ret += self.build_osstream(op.optvars, "optimized_variable")
 
         return ret
 
