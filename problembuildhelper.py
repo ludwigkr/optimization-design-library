@@ -25,6 +25,8 @@ class ProblemBuildHelper:
         for vi, v in enumerate(var.variables):
             if v.size1() == 1 and v.size2() == 1:
                 variable_structure += "    float " + var.names[vi] + ";\n"
+            elif v.size1() > 1 and v.size2() > 1:
+                variable_structure += "    Eigen::MatrixXd " + var.names[vi] + ";\n"
             else:
                 variable_structure += "    Eigen::VectorXd " + var.names[vi] + ";\n"
 
@@ -34,6 +36,8 @@ class ProblemBuildHelper:
             for vi, v in enumerate(var.variables):
                 if v.size1() == 1 and v.size2() == 1:
                     variable_structure += "float _" + var.names[vi] + ", "
+                elif v.size1() > 1 and v.size2() > 1:
+                    variable_structure += "Eigen::MatrixXd _" + var.names[vi] + ", "
                 else:
                     variable_structure += "Eigen::VectorXd _" + var.names[vi] + ", "
 
@@ -50,6 +54,8 @@ class ProblemBuildHelper:
                 if v.size1() == 1 and v.size2() == 1:
                     # variable_structure += "          float _" + var.names[vi] + ", "
                     pass
+                elif v.size1() > 1 and v.size2() > 1:
+                    variable_structure += f"          {var.names[vi]} = Eigen::MatrixXd({v.size(1)},{v.size(2)});\n"
                 else:
                     variable_structure += f"          {var.names[vi]} = Eigen::VectorXd({v.size(1)*v.size(2)});\n"
 
@@ -60,6 +66,8 @@ class ProblemBuildHelper:
             for vi, v in enumerate(var.variables):
                 if v.size1() == 1 and v.size2() == 1:
                     variable_structure += f"        ret += powf({var.names[vi]}, 2);\n"
+                elif v.size1() > 1 and v.size2() > 1:
+                    variable_structure += f"        ret += {var.names[vi]}.cwiseProduct({var.names[vi]}).sum();\n"
                 else:
                     variable_structure += f"        ret += {var.names[vi]}.transpose() * {var.names[vi]};\n"
 
@@ -359,7 +367,7 @@ class ProblemBuildHelper:
                 else:
                     for v in range(vars.variables[n].size(1)):
                         for w in range(vars.variables[n].size(2)):
-                            ret += f"    {struct_name}{connector}{name}[{v}, {w}] = {vector_name}[{idx}];\n"
+                            ret += f"    {struct_name}{connector}{name}({v}, {w}) = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
 

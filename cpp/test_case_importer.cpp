@@ -15,39 +15,43 @@ void TestCaseImporter::test_cast(int n, scenario_parameter* scenario, problem_pa
     std::map<std::string, size_t> map_xopt;
     std::tie(map_scenario, map_prob_param, map_xopt) = mappers();
 
+    parse_struct("scenario", static_cast<void*>(scenario), map_scenario, n);
+    parse_struct("prob_param", static_cast<void*>(prob_param), map_prob_param, n);
+    parse_struct("xopt", static_cast<void*>(xopt), map_xopt, n);
+}
 
-   for (const auto& item : data["cases"][n]["scenario"].items()) {
-        size_t offset = map_scenario[item.key()];
-        if(item.value().size()>1) {
-            Eigen::VectorXd* element_pnt = static_cast<Eigen::VectorXd*>(static_cast<void*>(scenario) + offset);
-            *element_pnt = parse_vector(n, "scenario", item.key());
+void TestCaseImporter::parse_struct(std::string struct_name, void* structure, std::map<std::string, size_t> mapper, int case_nr) {
+   for (const auto& item : data["cases"][case_nr][struct_name].items()) {
+        size_t offset = mapper[item.key()];
+        if(item.value().is_array()) {
+            if(item.value()[0].is_array()) {
+                Eigen::MatrixXd* element_pnt = static_cast<Eigen::MatrixXd*>(static_cast<void*>(structure) + offset);
+                *element_pnt = parse_matrix(case_nr, struct_name, item.key());
+            } else {
+                Eigen::VectorXd* element_pnt = static_cast<Eigen::VectorXd*>(static_cast<void*>(structure) + offset);
+                *element_pnt = parse_vector(case_nr, struct_name, item.key());
+            }
         } else {
-            float* element_pnt = static_cast<float*>(static_cast<void*>(scenario) + offset);
-            *element_pnt = parse_number(n, "scenario", item.key());
+            float* element_pnt = static_cast<float*>(static_cast<void*>(structure) + offset);
+            *element_pnt = parse_number(case_nr, struct_name, item.key());
         }
     }
+}
 
-   for (const auto& item : data["cases"][n]["prob_param"].items()) {
-        size_t offset = map_prob_param[item.key()];
-        if(item.value().size()>1) {
-            Eigen::VectorXd* element_pnt = static_cast<Eigen::VectorXd*>(static_cast<void*>(prob_param) + offset);
-            *element_pnt = parse_vector(n, "prob_param", item.key());
-        } else {
-            float* element_pnt = static_cast<float*>(static_cast<void*>(prob_param) + offset);
-            *element_pnt = parse_number(n, "prob_param", item.key());
+
+
+Eigen::MatrixXd TestCaseImporter::parse_matrix(int n, std::string struct_key, std::string key){
+    int rows = data["cases"][n][struct_key][key].size();
+    int columns = data["cases"][n][struct_key][key][0].size();
+    Eigen::MatrixXd ret = Eigen::MatrixXd(rows, columns);
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            ret(i, j) = data["cases"][n][struct_key][key][i][j];
         }
     }
-
-   for (const auto& item : data["cases"][n]["xopt"].items()) {
-        size_t offset = map_xopt[item.key()];
-        if(item.value().size()) {
-            Eigen::VectorXd* element_pnt = static_cast<Eigen::VectorXd*>(static_cast<void*>(xopt) + offset);
-            *element_pnt = parse_vector(n, "xopt", item.key());
-        } else {
-            float* element_pnt = static_cast<float*>(static_cast<void*>(xopt) + offset);
-            *element_pnt = parse_number(n, "xopt", item.key());
-        }
-    }
+    std::cout << ret << std::endl;
+    return ret;
 }
 
 Eigen::VectorXd TestCaseImporter::parse_vector(int n, std::string struct_key, std::string key) {

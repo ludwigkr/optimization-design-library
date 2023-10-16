@@ -26,6 +26,8 @@ class TestCaseImporter{
         json data; 
         int N = 0;
 
+        void parse_struct(std::string struct_name, void* structure, std::map<std::string, size_t> mapper, int case_nr);
+        Eigen::MatrixXd parse_matrix(int n, std::string struct_key, std::string key);
         Eigen::VectorXd parse_vector(int n, std::string struct_key, std::string key);
         float parse_number(int n, std::string struct_key, std::string key);
 };
