@@ -234,6 +234,7 @@ class TestCaseExporter():
             path = "./test-cases.json"
 
         self.export += "]}"
+        self.export = self.export.replace("00", "0")
 
         with open(path, "w") as f:
             f.write(json.dumps(json.loads(self.export), indent=2))
