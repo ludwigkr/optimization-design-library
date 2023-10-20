@@ -213,17 +213,27 @@ class TestCaseExporter():
         self.n += 1
 
         return ret
+
+    def value_to_json(self, name: str, val: casadi.DM) -> str:
+        is_matrix = val.shape[0] > 1 and val.shape[1] > 1
+        is_scalar = val.shape[0] == 1 and val.shape[1] == 1
+        if is_matrix:
+            return f'"{name}": {val},'
+        elif is_scalar:
+            return f'"{name}": {val[0]},'
+        else:
+            return f'"{name}": {list(np.array(val).reshape((-1)))},'
+
     
     def tojson(self, var:Variables, val: casadi.DM) -> str:
         ret = "{"
         if len(var.names) == 0:
             ret += ","
         elif len(var.names) == 1:
-            ret += f'"{var.names[0]}": {val.T},'
+            ret += self.value_to_json(var.names[0], val)
         elif len(var.names) > 1:
             for i, name in enumerate(var.names):
-                ret += f'"{name}": {val[i].T},'
-
+                ret += self.value_to_json(name, val[i])
         ret = ret[:-1]
         ret += "}"
         return ret
@@ -233,7 +243,8 @@ class TestCaseExporter():
             path = "./test-cases.json"
 
         self.export += "]}"
-        self.export = self.export.replace(" 00", " 0").replace("[00", "[0")
+        self.export = self.export.replace(" 00", " 0").replace("[00", "[0").replace("\n","")
+        print(self.export)
 
         with open(path, "w") as f:
             f.write(json.dumps(json.loads(self.export), indent=2))

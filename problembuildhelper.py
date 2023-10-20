@@ -377,9 +377,9 @@ class ProblemBuildHelper:
                         ret += f"    {struct_name}{connector}{name}[{v}] = {vector_name}[{idx}];\n"
                         idx += 1
                 else:
-                    for r in range(vars.variables[n].size(1)):
-                        for c in range(vars.variables[n].size(2)):
-                            ret += f"    {struct_name}{connector}{name}({c}, {r}) = {vector_name}[{idx}];\n"
+                    for c in range(vars.variables[n].size(2)):
+                        for r in range(vars.variables[n].size(1)):
+                            ret += f"    {struct_name}{connector}{name}({r}, {c}) = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
 
