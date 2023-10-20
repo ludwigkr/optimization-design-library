@@ -2,6 +2,7 @@
 import sys
 import casadi
 import re
+import numpy as np
 
 from variables import Variables
 from optimizationproblem import OptimizationProblem
@@ -218,13 +219,24 @@ class ProblemBuildHelper:
 
         return exp
 
+    def replace_pattern_for_substitute_variable_in_struct(self, struct_name: str, link_symbol: str, var: str, vars: Variables, n: int)->str:
+        vars_idx = vars.idxs[var]
+        var_is_matrix = np.array(vars_idx).shape[0] > 1 and np.array(vars_idx).shape[1] > 1
+        if var_is_matrix:
+            var_idx = np.where(vars_idx == n)
+            replace_pattern = f"{struct_name}{link_symbol}{var}({int(var_idx[0])},{int(var_idx[1])})"
+        else:
+            replace_pattern = struct_name + link_symbol + var + "[" + str(n) + "]"
+        return replace_pattern 
+
+
     def substitute_variable_in_struct(self, exp: str, sturct_name: str, link_symbol: str, vars: Variables) -> str:
         for v, var in enumerate(vars.names):
             N = vars.variables[v].size1() * vars.variables[v].size2()
             if N > 1:
                 for n in reversed(range(N)):
                     search_pattern = "(?!_\w+)" + var + "_" + str(n)+ "(?!_\w+)"
-                    replace_pattern = sturct_name + link_symbol + var + "[" + str(n) + "]"
+                    replace_pattern = self.replace_pattern_for_substitute_variable_in_struct(sturct_name, link_symbol, var, vars, n)
                     exp = re.sub(search_pattern, replace_pattern, exp)
             else:
                 search_pattern = "(?!_\w+)" + var + "(?!_\w+)"
@@ -365,9 +377,9 @@ class ProblemBuildHelper:
                         ret += f"    {struct_name}{connector}{name}[{v}] = {vector_name}[{idx}];\n"
                         idx += 1
                 else:
-                    for v in range(vars.variables[n].size(1)):
-                        for w in range(vars.variables[n].size(2)):
-                            ret += f"    {struct_name}{connector}{name}({v}, {w}) = {vector_name}[{idx}];\n"
+                    for r in range(vars.variables[n].size(1)):
+                        for c in range(vars.variables[n].size(2)):
+                            ret += f"    {struct_name}{connector}{name}({c}, {r}) = {vector_name}[{idx}];\n"
                             idx += 1
         return ret
 

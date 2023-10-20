@@ -203,7 +203,6 @@ class TestCaseExporter():
         self.export = '{"cases":['
         self.n = 0
 
-    
     def add_case(self, ocp: OptimizationProblem, scenario, prob_param, result) -> str:
         if self.n > 0:
             self.export += ","
@@ -220,10 +219,10 @@ class TestCaseExporter():
         if len(var.names) == 0:
             ret += ","
         elif len(var.names) == 1:
-            ret += f'"{var.names[0]}": {val},'
+            ret += f'"{var.names[0]}": {val.T},'
         elif len(var.names) > 1:
             for i, name in enumerate(var.names):
-                ret += f'"{name}": {val[i]},'
+                ret += f'"{name}": {val[i].T},'
 
         ret = ret[:-1]
         ret += "}"
@@ -234,7 +233,7 @@ class TestCaseExporter():
             path = "./test-cases.json"
 
         self.export += "]}"
-        self.export = self.export.replace("00", "0")
+        self.export = self.export.replace(" 00", " 0").replace("[00", "[0")
 
         with open(path, "w") as f:
             f.write(json.dumps(json.loads(self.export), indent=2))
