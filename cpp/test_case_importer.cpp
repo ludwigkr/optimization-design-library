@@ -20,6 +20,8 @@ void TestCaseImporter::test_cast(int n, scenario_parameter* scenario, problem_pa
     parse_struct("xopt", static_cast<void*>(xopt), map_xopt, n);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpointer-arith"
 void TestCaseImporter::parse_struct(std::string struct_name, void* structure, std::map<std::string, size_t> mapper, int case_nr) {
    for (const auto& item : data["cases"][case_nr][struct_name].items()) {
         size_t offset = mapper[item.key()];
@@ -37,7 +39,7 @@ void TestCaseImporter::parse_struct(std::string struct_name, void* structure, st
         }
     }
 }
-
+#pragma GCC diagnostic pop
 
 
 Eigen::MatrixXd TestCaseImporter::parse_matrix(int n, std::string struct_key, std::string key){
@@ -50,7 +52,6 @@ Eigen::MatrixXd TestCaseImporter::parse_matrix(int n, std::string struct_key, st
             ret(i, j) = data["cases"][n][struct_key][key][i][j];
         }
     }
-    std::cout << ret << std::endl;
     return ret;
 }
 
