@@ -92,7 +92,7 @@ class ProblemBuildHelper:
         tmp_file = '/tmp/opti_design_lib'
         with open(tmp_file,'wt') as sys.stdout:
         # sys.stdout = open(tmp_file,'wt')
-            mat.print_sparse()
+            mat.print_sparse(False)
         sys.stdout = sys.__stdout__
         with open(tmp_file, "r") as f:
             ret = f.read()
