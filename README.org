@@ -11,7 +11,7 @@ This repository is designed to assist users with the following:
 
 ** Why You Might Prefer Casadi-Independent Code:
 
-- Casadi's opimizations can have significant runtime delays, which can be problematic in real-time applications with tight computational time constraints. By developing Casadi-independent code, this project aims to mitigate this issue and make the time consumption more tracable.
+- Casadi's optimizations can have significant runtime delays, which can be problematic in real-time applications with tight computational time constraints. By developing Casadi-independent code, this project aims to mitigate this issue and make the time consumption more traceable.
 - Reducing the package size and minimizing dependencies.
 - Enhancing the readability and verifiability of the generated code.
 
@@ -19,7 +19,7 @@ This repository is designed to assist users with the following:
 Let's see, how an optimization problem can be formulated with this library. Working examples can be found here: [[file:min_nlp_with_params/ocp_min_nlp_with_params.py]].
 
 **  Build core formulation
-The first step is to create an =OptimizationProblem=-object in wich we can save all our formulations. We also give it name, which used in the file names of the generated code:
+The first step is to create an =OptimizationProblem=-object in which we can save all our formulations. We also give it a name, which is used in the file names of the generated code:
 #+begin_src python
 ocp = OptimizationProblem()
 ocp.name = 'min_nlp'
@@ -31,34 +31,34 @@ X = SX.sym('X', 2, 1)
 ocp.optvars.register('X', X)
 #+end_src
 
-, and define the cost function of the optimization problem:
+and define the cost function of the optimization problem:
 #+begin_src python
 objective = 0.4 * X[0,:]**2 - 5 * X[0,:] + X[1,:]**2 - 6*X[1,:] + 50
 ocp.register_objective(objective)
 #+end_src
 
-We can also define parameters, which are variable in the optimization problem formulation, but which are not used be the optimizer to minimize the cost function (as the optimization variables):
+We can also define parameters, which are variables in the optimization problem formulation, but which are not used by the optimizer to minimize the cost function (as the optimization variables):
 #+begin_src python
 P = SX.sym("P", 1, 1)
 ocp.problem_parameters.register('P', P)
 #+end_src
 
-With formulating the constraints, we finish the core formulation of the optmization problem:
+With formulating the constraints, we finish the core formulation of the optimization problem:
 #+begin_src python
 constraint1 = X[1,:] - X[0,:]
 ocp.constraints.register("c1", constraint1)
 #+end_src
 
 ** Build constraints and initial guess
-In this part we define the rules for creating the initial guess and the constraint limits for the box constraints =lb < X < ub= and the equality constraints =lbg < f(x) < ubg=.
+In this part, we define the rules for creating the initial guess and the constraint limits for the box constraints =lb < X < ub= and the equality constraints =lbg < f(x) < ubg=.
 
-These vectors (X0, lb, ub, lbg and ubg) are typical dependent on the special situation in which the optimization problem is solved for. Therefore, we first define the set of variables, which define the current situation and put them in a new struct =scenario_parameter=.
+These vectors (X0, lb, ub, lbg and ubg) are typical dependent on the special situation in which the optimization problem is solved for. Therefore, we first define the set of variables, which define the current situation and put them in a new structure =scenario_parameter=.
 #+begin_src python
 SP = SX.sym('SP', ocp.optvars.n_vars, 1)
 ocp.scenario_parameters.register("SP", SP)
 #+end_src
 
-Next, based on the scenario-parameters we can define, how the inital guesss is  build:
+Next, based on the scenario-parameters we can define, how the initial guess is  build:
 #+begin_src python
 X0 = SX.sym('X0', ocp.optvars.n_vars, 1)
 X0[0] = SP[0]
@@ -81,19 +81,19 @@ That's it!
 
 ** Test optimization problem (in python)
 Let's see how to actually solve the optimization problem.
-We first build a casadi optimization solver
+We first build a Casadi optimization solver
 #+begin_src python
 opts = load_optimizer_settings()
 solver = optimizationsolver.build_solver(ocp, opts)
 #+end_src
 
-The casadi solver is the solver we use on the python side:
+The Casadi solver is the solver we use on the python side:
 #+begin_src python
 scenario = ocp.scenario_parameters.packed([10, 10])
 result = optimizationsolver.run(solver, ocp, scenario)
 #+end_src
 
-If everything works as expexted, you can export the optimization problem to cpp code, which is independent of the casadi library.
+If everything works as expected, you can export the optimization problem to cpp code, which is independent of the Casadi library.
 #+begin_src python
 cppbuilder = CppBuilder()
 cppbuilder.build(ocp)
@@ -123,7 +123,7 @@ In cpp, calling the optimization problem is as easy as in python:
    #+end_src
 
 
-* Overview SQPMethod runtime logic
+* Overview SQP-Method runtime logic
 
 *WARNING:* The SQPMethod is a reimplementation of Casadis SQPMethod. Therefore, it is in best case as good as Casadis SQPMethod. However, Casadis SQPMethod is not ready for production!
 
