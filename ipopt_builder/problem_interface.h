@@ -1,3 +1,4 @@
+#pragma once
 #define HAVE_STDDEF_H
 #include <IpIpoptApplication.hpp>
 #include <IpSolveStatistics.hpp>
@@ -6,7 +7,7 @@
 
 using namespace Ipopt;
 
-class Problem_Interface{
+class Problem_Interface {
 
 public:
     scenario_parameter scenario;
