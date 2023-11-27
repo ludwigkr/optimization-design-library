@@ -49,7 +49,12 @@ class TestProblemBuildHelper(unittest.TestCase):
           X = Eigen::VectorXd(2);
           Y = Eigen::VectorXd(2);
 }
-
+    float norm() {
+        float ret = 0;
+        ret += X.transpose() * X;
+        ret += Y.transpose() * Y;
+        return sqrt(ret);
+    }
 };"""
         self.assertTrue(target_output == output)
 

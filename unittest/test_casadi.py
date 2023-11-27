@@ -2,6 +2,9 @@
 import unittest
 import casadi
 import numpy as np
+import sys
+sys.path.append("..")
+from math_helper import symetric_based_on_numeric
 
 
 class TestCasadi(unittest.TestCase):
@@ -74,14 +77,14 @@ class TestCasadi(unittest.TestCase):
             mat[1, 0] = X[0]*X[1]
             mat[0, 1] = X[1]*X[0]
             mat[1, 1] = X[1]
-            self.assertTrue(symetric_based_on_numeric(mat, [X]))
+            self.assertTrue(symetric_based_on_numeric(mat, [X, [], []]))
 
         with self.subTest("non-symetric"):
             mat[0, 0] = X[0]
             mat[1, 0] = X[0]*2
             mat[0, 1] = X[1]*X[0]
             mat[1, 1] = X[1]
-            self.assertFalse(symetric_based_on_numeric(mat, [X]))
+            self.assertFalse(symetric_based_on_numeric(mat, [X, [], []]))
 
 if __name__ == '__main__':
     unittest.main()
