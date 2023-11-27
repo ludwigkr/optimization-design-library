@@ -1,4 +1,5 @@
 #+title: Optimization design library
+[[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittests-core.yml/badge.svg]]
 
 * Why Choose This Library?
 
