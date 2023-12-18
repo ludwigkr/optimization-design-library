@@ -11,6 +11,7 @@ include_directories("../../../cpp")
 include_directories("/usr/include/coin")
 link_directories("/usr/lib")
 
+
 set(SOURCE_FILES_IPOPT_TEST
     main.cpp
     ../min_nlp_with_params_interface.cpp
