@@ -2,6 +2,7 @@
 import os
 import sys
 import casadi
+import shutil
 from pathlib import Path
 
 local_folder_path = os.path.dirname(__file__)
@@ -20,6 +21,8 @@ class IpoptBuilder:
         self.build_problem_source(op, qoe, path)
         self.build_interface_header(op, path)
         self.build_interface_source(op, path)
+        shutil.copy(local_folder_path + "/ipopt_params.h", path)
+        shutil.copy(local_folder_path + "/ipopt_params.cpp", path)
 
     def build_interface_header(self, op: OptimizationProblem, path: str) -> None:
             with open(local_folder_path + '/problem_interface.h', 'r') as f:

@@ -12,18 +12,20 @@ include_directories("/usr/include/coin")
 link_directories("/usr/lib")
 
 
-set(SOURCE_FILES_IPOPT_TEST
+set(SOURCE_FILES_IPOPT_MAIN
     main.cpp
+    ../ipopt_params.cpp
     ../min_nlp_with_params_interface.cpp
     ../min_nlp_with_params_problem_ipopt.cpp)
 
-add_executable(${PROJECT_NAME}_main ${SOURCE_FILES_IPOPT_TEST})
+add_executable(${PROJECT_NAME}_main ${SOURCE_FILES_IPOPT_MAIN})
 target_link_libraries(${PROJECT_NAME}_main ipopt)
 
 set(SOURCE_FILES_IPOPT_TEST
     ./test_main.cpp
     ../../../cpp/test_case_importer.cpp
     ./test_min_nlp_with_params.cpp
+    ../ipopt_params.cpp
     ../min_nlp_with_params_interface.cpp
     ../min_nlp_with_params_problem_ipopt.cpp)
 
