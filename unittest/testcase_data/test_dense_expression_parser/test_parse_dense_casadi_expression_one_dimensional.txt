@@ -1,0 +1,5 @@
+float X_temporary1 = 0;
+X[0] = X_temporary1;
+X[1] = X_temporary1;
+X[2] = sq(X_1);
+X[3] = X_3;

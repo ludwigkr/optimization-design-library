@@ -10,49 +10,6 @@ from pathlib import Path
 local_folder_path = os.path.dirname(__file__)
 sys.path.append(local_folder_path + "/casadi_parser")
 
-
-def definition_export(op: OptimizationProblem, custome_defines="", trajectory_parameter=None):
-    header_content = "#pragma once\n"
-    header_content += '#define ' + op.name.upper() + '_VERSION "' + str(op.version) + '"\n'
-    header_content += '#define N_OPTVARS ' + str(op.optvars.n_vars) + '\n'
-    header_content += '#define N_CONSTRAINTS ' + str(op.constraints.n_constraints) + '\n'
-    header_content += custome_defines
-    header_content += "\n"
-
-    header_content += "enum optvar_idx {\n"
-    for j, idxs_key in enumerate(op.optvars.idxs):
-        name = op.optvars.names[j]
-        idxs = op.optvars.idxs[idxs_key]
-        if len(idxs) == 1:
-            header_content += "    " + name + " = " + str(op.optvars.idxs[idxs_key][0, 0]) + ",\n"
-        else:
-            header_content += "    " + name + "_first = " + str(op.optvars.idxs[idxs_key][0, 0]) + ",\n"
-            header_content += "    " + name + "_last = "  + str(op.optvars.idxs[idxs_key][-1, -1]) + ",\n"
-    header_content += "};\n"
-    header_content += "\n"
-
-    header_content += "enum inequality_constraint_idx {\n"
-    for j, idxs_key in enumerate(op.constraints.idxs):
-        name = idxs_key
-        idxs = op.constraints.idxs[idxs_key]
-        if len(idxs) == 1:
-            header_content += "    " + name + " = " + str(op.constraints.idxs[idxs_key][0]) + ",\n"
-        else:
-            header_content += "    " + name + "_first = " + str(op.constraints.idxs[idxs_key][0]) + ",\n"
-            header_content += "    " + name + "_last = "  + str(op.constraints.idxs[idxs_key][-1]) + ",\n"
-    header_content += "};\n"
-    header_content += "\n"
-
-    if trajectory_parameter:
-        header_content += "enum trjactory_parameter {\n"
-        for parameter in trajectory_parameter:
-            header_content += "    " + str(parameter) + " = " + str(trajectory_parameter[parameter]) + ",\n"
-        header_content += "};\n"
-
-
-    with open(Path("./" + op.name + "_index.h").expanduser(), "w") as f:
-        f.write(header_content)
-
 def build_solver(op: OptimizationProblem, opts):
     forbidden_variables = ['lam', 'x', 'xopt', 'param']
 
@@ -75,10 +32,9 @@ def build_solver(op: OptimizationProblem, opts):
     # assert(not op.fn_initial_guess.is_null())
 
     solver = casadi.nlpsol('solver', opts["optimizer"], {'x': op.optvars.variables_flat(), 'p': op.problem_parameters.variables_flat(), 'f': op.objective, 'g': op.constraints.equations_flat()}, opts["options"])
-    solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': True, 'cpp': True})
-    os.system("gcc -fPIC -shared -O3 " + op.name + "_optimizer.cpp -o " + op.name + "_optimizer.so")
-
-    definition_export(op, op.exported_defines.code, op.trajectory_parameters.parameter)
+    # solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': True, 'cpp': True})
+    # os.system("gcc -fPIC -shared -O3 " + op.name + "_optimizer.cpp -o " + op.name + "_optimizer.so")
+    # definition_export(op, op.exported_defines.code)
 
     return solver
 
@@ -241,6 +197,10 @@ class TestCaseExporter():
     def save(self, path: str=None):
         if path == None:
             path = "./test-cases.json"
+
+        folder = os.path.dirname(path)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
         self.export += "]}"
         self.export = self.export.replace(" 00", " 0").replace("[00", "[0").replace("\n","")

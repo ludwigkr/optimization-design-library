@@ -1,0 +1,12 @@
+std::ostream& operator<<(std::ostream& os, const scenario_parameter& s) {
+   return os << "{ C: " << s.C.transpose() <<  " D: " << s.D <<  " }";
+};
+
+std::ostream& operator<<(std::ostream& os, const problem_parameter& s) {
+   return os << "{ A: " << s.A.transpose() <<  " B: " << s.B <<  " }";
+};
+
+std::ostream& operator<<(std::ostream& os, const optimized_variable& s) {
+   return os << "{ X: " << s.X.transpose() <<  " Y: " << s.Y <<  " }";
+};
+

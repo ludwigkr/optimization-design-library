@@ -13,10 +13,7 @@ from optimizationproblem import OptimizationProblem
 from variables import Variables
 from function import Function
 from constraints import Constraints
-from ocp_min_nlp_with_params import optimization_problem_min_nlp_with_params
-from qpelements import QuadraticOptimizerElements
-
-from problembuildhelper import ProblemBuildHelper
+from quadratic_optimizer_elements import QuadraticOptimizerElements
 
 class TestFunctions(unittest.TestCase):
 

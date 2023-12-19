@@ -1,0 +1,6 @@
+optimized_variable operator-(const optimized_variable& left, const optimized_variable& right) {
+    optimized_variable ret;
+    ret.X = left.X - right.X;
+    ret.Y = left.Y - right.Y;
+    return ret;
+};

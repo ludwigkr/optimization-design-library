@@ -1,0 +1,10 @@
+iRow[0] = 0;
+jCol[0] = 0;
+iRow[1] = 1;
+jCol[1] = 0;
+iRow[2] = 1;
+jCol[2] = 1;
+float values_temporary1 = 2;
+values[0] = values_temporary1;
+values[1] = lamg_0;
+values[2] = values_temporary1;

@@ -24,6 +24,27 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set up C++ compiler
+      uses: aminya/setup-cpp@v1
+      with:
+        compiler: ${{ matrix.compiler }}
+        cmake: true
+        make: true
+
+    - name: Install C++ dependencies
+      run: |
+        sudo apt-get install coinor-libipopt-dev -y
+        sudo apt-get install cpputest -y
+
+        git submodule update --init --recursive
+
+        git clone https://gitlab.com/libeigen/eigen.git
+        cd eigen
+        git checkout 3.4
+        mkdir build && cd build
+        cmake .. && make -j4 && sudo make install && sudo ldconfig
+        cd ../..
+
     - name: Run tests
       run: |
         cd unittest && python -m unittest

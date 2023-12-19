@@ -51,7 +51,3 @@ jobs:
         cmake .. && make -j4 && sudo make install && sudo ldconfig
         cd ../..
 
-    - name: Run min_nlp_with_params tests
-      run: |
-        cd min_nlp_with_params && python3 ocp_min_nlp_with_params.py
-        cd cpp/unittest && mkdir -p build && cd build && cmake .. && make && ./min_nlp_with_params_test

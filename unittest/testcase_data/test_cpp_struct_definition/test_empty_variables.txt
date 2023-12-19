@@ -1,0 +1,6 @@
+struct problem_parameter{
+    float norm() {
+        float ret = 0;
+        return sqrt(ret);
+    }
+};
