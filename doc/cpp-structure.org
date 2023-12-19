@@ -1,3 +1,0 @@
-#+title: Cpp Structure
-
-[[./optimization-design-library-design.drawio]]

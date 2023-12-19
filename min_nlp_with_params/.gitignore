@@ -4,3 +4,5 @@
 *.org
 *.txt
 __pycache__
+*.json
+cpp/unittest/build
