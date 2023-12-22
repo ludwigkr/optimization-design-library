@@ -130,6 +130,11 @@ In cpp, calling the optimization problem is as easy as in python:
 act -W '.github/workflows/'
 #+end_src
 
+* Check Code Coverage
+
+#+begin_src sh
+coverage run --source=.. -m unittest && coverage html && coverage report
+#+end_src
 
 * Overview SQP-Method runtime logic
 
