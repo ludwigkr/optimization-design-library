@@ -48,8 +48,6 @@ class CppBuilder:
             os.popen(cmd)
             print(cmd)
 
-
-
     def build_index(self, op: OptimizationProblem, path=None) -> None:
         index_header = "#pragma once\n"
         index_header += '#define ' + op.name.upper() + '_VERSION "' + str(op.version) + '"\n'

@@ -37,6 +37,8 @@ def optimization_problem_min_nlp_with_params():
 if __name__ == "__main__":
     ocp = optimization_problem_min_nlp_with_params()
 
+    optimizationsolver.core_formulation(ocp)
+
     # Build solver:
     opts = load_optimizer_settings("ipopt")
     solver = optimizationsolver.build_solver(ocp, opts)

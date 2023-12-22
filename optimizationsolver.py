@@ -11,7 +11,7 @@ local_folder_path = os.path.dirname(__file__)
 sys.path.append(local_folder_path + "/casadi_parser")
 
 
-def definition_export(op: OptimizationProblem, custome_defines="", trajectory_parameter=None):
+def definition_export(op: OptimizationProblem, custome_defines=""):
     header_content = "#pragma once\n"
     header_content += '#define ' + op.name.upper() + '_VERSION "' + str(op.version) + '"\n'
     header_content += '#define N_OPTVARS ' + str(op.optvars.n_vars) + '\n'
@@ -43,13 +43,6 @@ def definition_export(op: OptimizationProblem, custome_defines="", trajectory_pa
     header_content += "};\n"
     header_content += "\n"
 
-    if trajectory_parameter:
-        header_content += "enum trjactory_parameter {\n"
-        for parameter in trajectory_parameter:
-            header_content += "    " + str(parameter) + " = " + str(trajectory_parameter[parameter]) + ",\n"
-        header_content += "};\n"
-
-
     with open(Path("./" + op.name + "_index.h").expanduser(), "w") as f:
         f.write(header_content)
 
@@ -78,7 +71,7 @@ def build_solver(op: OptimizationProblem, opts):
     solver.generate_dependencies(op.name + '_optimizer.cpp', {'with_header': True, 'cpp': True})
     os.system("gcc -fPIC -shared -O3 " + op.name + "_optimizer.cpp -o " + op.name + "_optimizer.so")
 
-    definition_export(op, op.exported_defines.code, op.trajectory_parameters.parameter)
+    definition_export(op, op.exported_defines.code)
 
     return solver
 

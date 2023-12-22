@@ -13,6 +13,12 @@ class TestVariables(unittest.TestCase):
         self.X = casadi.SX.sym("X", 2, 1)
         self.scenario = casadi.SX.sym("scenario")
 
+        self.var = Variables()
+        var1 = casadi.SX.sym('var1', 2, 1)
+        self.var.register("var1", var1)
+        var2 = casadi.SX.sym('var2', 2, 1)
+        self.var.register("var2", var2)
+
     def test_variables(self):
         var = Variables()
         check = var.variables_flat()
@@ -50,6 +56,24 @@ class TestVariables(unittest.TestCase):
 
         data0 = np.array([2., 1, 0, 4])
         check = var.packed(data0)
+
+    def test_assign_values(self):
+        with self.subTest("packed"):
+            data = self.var.unpacked([[1,2], [3,4]])
+            packed = self.var.packed(data)
+            self.assertTrue(packed[0][0] == 1)
+
+        with self.subTest("buggy variable decleration"):
+            """If variables var1 and var2 are not symbolic, this leads to error.
+                   Compare against packed-subtest."""
+            var = Variables()
+            var1 = casadi.SX(2, 1)
+            var.register("var1", var1)
+            var2 = casadi.SX(2, 1)
+            var.register("var2", var2)
+            data = var.unpacked([[1,2], [3,4]])
+            packed = var.packed(data)
+            self.assertFalse(packed[0][0] == 1)
 
 if __name__ == '__main__':
     unittest.main()

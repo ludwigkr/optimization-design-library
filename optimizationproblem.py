@@ -16,13 +16,6 @@ class ExportedDefines:
         self.defines[name] = value
         self.code += "#define " + name.upper() + " " + str(value) + "\n"
 
-class ROSTrajectoryParameter:
-    """Parameters to plot parts of the optimization variable as trajectories in ROS"""
-    def __init__(self):
-        self.parameter = {}
-
-    def register_trajectory(self, name, idx):
-        self.parameter[name] = idx
 
 class OptimizationProblem:
     def __init__(self):
@@ -36,7 +29,6 @@ class OptimizationProblem:
         self.problem_parameters = Variables() # Variables passed to the solver, but which cannot be changed by it. E.g. plane orientation, etc..
         self.scenario_parameters = Variables() # Values required to build a specific optimization problem like current drone position, etc
         self.exported_defines = ExportedDefines()
-        self.trajectory_parameters = ROSTrajectoryParameter()
         self.fn_initial_guess = Function()
         self.fn_params = Function()
         self.fn_lbx = Function()

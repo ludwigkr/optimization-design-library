@@ -70,39 +70,6 @@ class Variables:
 if __name__ == "__main__":
     import unittest
 
-    class TestVatiables(unittest.TestCase):
-        def setUp(self) -> None:
-            self.var = Variables()
-            var1 = SX.sym('var1', 2, 1)
-            self.var.register("var1", var1)
-            var2 = SX.sym('var2', 2, 1)
-            self.var.register("var2", var2)
-
-            return super().setUp()
-
-        def test_assign_values(self):
-
-            with self.subTest("packed"):
-                data = self.var.unpacked([[1,2], [3,4]])
-                packed = self.var.packed(data)
-                self.assertTrue(packed[0][0] == 1)
-
-            with self.subTest("buggy variable decleration"):
-                """If variables var1 and var2 are not symbolic, this leads to error. 
-                    Compare against packed-subtest."""
-                var = Variables()
-                var1 = SX(2, 1)
-                var.register("var1", var1)
-                var2 = SX(2, 1)
-                var.register("var2", var2)
-                data = var.unpacked([[1,2], [3,4]])
-                packed = var.packed(data)
-                self.assertFalse(packed[0][0] == 1)
-
-            # with self.subTest("structed variables assigning"):
-            #     print(self.var.pack_variables_fn())
-            #     print(self.var.pack_variables_fn()([1,2,3,4]))
-            #     print(self.var.unpacked([1,2], [3,4]))
 
 
     unittest.main()
