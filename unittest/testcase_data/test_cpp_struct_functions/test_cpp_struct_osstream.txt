@@ -1,0 +1,4 @@
+std::ostream& operator<<(std::ostream& os, const foo& s) {
+   return os << "{ X: " << s.X <<  " }";
+};
+

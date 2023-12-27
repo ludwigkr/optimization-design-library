@@ -227,7 +227,7 @@ class ProblemBuildHelper:
             replace_pattern = f"{struct_name}{link_symbol}{var}({int(var_idx[0])},{int(var_idx[1])})"
         else:
             replace_pattern = struct_name + link_symbol + var + "[" + str(n) + "]"
-        return replace_pattern 
+        return replace_pattern
 
 
     def substitute_variable_in_struct(self, exp: str, sturct_name: str, link_symbol: str, vars: Variables) -> str:

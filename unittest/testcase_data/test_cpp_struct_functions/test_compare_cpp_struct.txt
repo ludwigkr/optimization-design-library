@@ -1,0 +1,5 @@
+foo operator-(const foo& left, const foo& right) {
+    foo ret;
+    ret.X = left.X - right.X;
+    return ret;
+};

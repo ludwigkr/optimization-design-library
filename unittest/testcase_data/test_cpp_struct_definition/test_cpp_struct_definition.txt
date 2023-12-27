@@ -1,0 +1,14 @@
+struct optimization_variable{
+    float X;
+
+    optimization_variable(float _X):
+        X(_X){}
+
+    optimization_variable(){
+}
+    float norm() {
+        float ret = 0;
+        ret += powf(X, 2);
+        return sqrt(ret);
+    }
+};

@@ -1,0 +1,16 @@
+std::tuple<std::map<std::string, size_t>, std::map<std::string, size_t>, std::map<std::string, size_t>> mappers(){
+    std::map<std::string, size_t> map_scenario;
+    std::map<std::string, size_t> map_prob_param;
+    std::map<std::string, size_t> map_xopt;
+
+    map_scenario["C"] = offsetof(scenario_parameter, C);
+    map_scenario["D"] = offsetof(scenario_parameter, D);
+
+    map_prob_param["A"] = offsetof(problem_parameter, A);
+    map_prob_param["B"] = offsetof(problem_parameter, B);
+
+    map_xopt["X"] = offsetof(optimized_variable, X);
+    map_xopt["Y"] = offsetof(optimized_variable, Y);
+
+    return std::tuple(map_scenario, map_prob_param, map_xopt);
+};
