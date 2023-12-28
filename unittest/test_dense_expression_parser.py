@@ -34,6 +34,14 @@ class TestDenseExpressionParser(unittesthelper.ParserTestCase):
         if reference:
             self.assertTrue(result == reference)
 
+    def test_parse_dense_casadi_expression_one_dimensional(self):
+        result = dense_expression_parser.parse_dense_casadi_expression("X", self.X, one_dimensional=True)
+
+        reference = self.load_reference()
+        self.save_reference(result)
+        if reference:
+            self.assertTrue(result == reference)
+
 
 if __name__ == "__main__":
     import unittest
