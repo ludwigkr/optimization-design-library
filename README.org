@@ -17,6 +17,10 @@ This repository is designed to assist users with the following:
 - Reducing the package size and minimizing dependencies.
 - Enhancing the readability and verifiability of the generated code.
 
+* Variable overview
+
+[[file:doc/variable-process-overview.svg]]
+
 * Workflow
 Let's see, how an optimization problem can be formulated with this library. Working examples can be found here: [[file:min_nlp_with_params/ocp_min_nlp_with_params.py]].
 
@@ -139,18 +143,3 @@ coverage run --source=.. -m unittest && coverage html && coverage report
 * Overview SQP-Method runtime logic
 
 *WARNING:* The SQPMethod is a reimplementation of Casadis SQPMethod. Therefore, it is in best case as good as Casadis SQPMethod. However, Casadis SQPMethod is not ready for production!
-
-  [[file:doc/optimization-design-library-design.svg]]
-
-* Variables
-- =problem_parameters= (variable name: =prob_params=): Parameters of the optimization definition, passed to the optimizer (should but are not generated from scenario)
-  Generated in interface-class or higher
-- =scenario_parameters= (variable_name: =scenario=): All variables which are required to build initial guess or the limit vectors
-  Generated in interface-class or higher. Replaced before the optimization call with number, so they are not passed as parameter to the optimizer.
-
-- =quad_prob_parameter=: Collection of initial guess and limits passed to the optimizer classes
-  Generated in Interface-class
-- =optimizer_options=: Not yet used(?)
-
-  [[file:doc/variable-process-overview.svg]]
-
