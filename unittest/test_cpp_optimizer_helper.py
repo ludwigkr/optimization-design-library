@@ -13,19 +13,13 @@ import cpp_optimizer_helper
 class TestCppOptimizerHelper(unittesthelper.ParserTestCase):
     def setUp(self):
         self.op = OptimizationProblem() #
-        X = casadi.SX.sym("X", 2, 1)
-        self.op.optvars.register("X", X)
-        Y = casadi.SX.sym("Y")
-        self.op.optvars.register("Y", Y)
+        self.op.optvars.register("X", [2,1])
+        self.op.optvars.register("Y")
 
-        A = casadi.SX.sym("A", 2, 1)
-        self.op.problem_parameters.register("A", A)
-        B = casadi.SX.sym("B")
-        self.op.problem_parameters.register("B", B)
-        C = casadi.SX.sym("C", 2, 1)
-        self.op.scenario_parameters.register("C", C)
-        D = casadi.SX.sym("D")
-        self.op.scenario_parameters.register("D", D)
+        self.op.problem_parameters.register("A", [2,1])
+        self.op.problem_parameters.register("B")
+        self.op.scenario_parameters.register("C", [2,1])
+        self.op.scenario_parameters.register("D")
 
         self.exp1 = \
 """X[0,0] = C_0+X_0*X_1;

@@ -11,8 +11,7 @@ def hs074_problem():
     ocp = OptimizationProblem()
     ocp.name = 'hs074'
 
-    x = casadi.SX.sym("xi", 2, 2)
-    ocp.optvars.register("xi", x)
+    x = ocp.optvars.register("xi", [2,2])
 
     # objective = x[0]*x[3]*(x[0]+x[1]+x[2])+x[2]
     objective = x[0,0]*x[1,1]*(x[0,0]+x[1,0]+x[0,1])+x[0,1]
@@ -28,8 +27,7 @@ def hs074_problem():
 
 def add_hs074_build_functions(ocp):
     init_guess = casadi.SX(ocp.optvars.n_vars, 1)
-    X_guess = casadi.SX.sym("X_guess", 2, 2)
-    ocp.scenario_parameters.register("X_guess", X_guess)
+    X_guess = ocp.scenario_parameters.register("X_guess", [2,2])
     init_guess[0] = X_guess[0, 0]
     init_guess[1] = X_guess[1, 0]
     init_guess[2] = X_guess[0, 1]

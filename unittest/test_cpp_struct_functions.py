@@ -14,12 +14,11 @@ import optimizationproblem
 
 class TestCppStructDefintion(unittesthelper.ParserTestCase):
     def setUp(self):
-        X = casadi.SX.sym("X")
         self.var = variables.Variables()
-        self.var.register("X", X)
+        self.var.register("X")
 
         self.op = optimizationproblem.OptimizationProblem()
-        self.op.optvars.register("X", X)
+        self.op.optvars.register("X")
 
     def test_compare_cpp_struct(self):
         result = cpp_struct_functions.compare_cpp_sruct("foo", self.var)

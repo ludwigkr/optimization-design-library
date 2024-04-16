@@ -17,12 +17,21 @@ class Variables:
 
         return optvars_idxs.reshape((new_vars.size1(), new_vars.size2()), order='F')
 
-    def register(self, name:str, new_vars: casadi.SX):
+    def register(self, name:str, dim=None):
+        if type(dim) == int:
+            new_vars = casadi.SX.sym(name, dim)
+        elif type(dim) == list:
+            new_vars = casadi.SX.sym(name, dim[0], dim[1])
+        elif dim is None:
+            new_vars = casadi.SX.sym(name)
+        else:
+            raise RuntimeError("Wrong dimensionn type.")
         assert(type(new_vars) == casadi.casadi.SX)
         assert(type(name) == str)
         self.idxs[name] = self.__update_index(new_vars)
         self.variables.append(new_vars)
         self.names.append(name)
+        return new_vars
 
     def block_by_name(self, name):
         assert(name in self.names)

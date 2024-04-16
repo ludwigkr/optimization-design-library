@@ -14,17 +14,15 @@ class TestVariables(unittest.TestCase):
         self.scenario = casadi.SX.sym("scenario")
 
         self.var = Variables()
-        var1 = casadi.SX.sym('var1', 2, 1)
-        self.var.register("var1", var1)
-        var2 = casadi.SX.sym('var2', 2, 1)
-        self.var.register("var2", var2)
+        self.var.register("var1", [2,1])
+        self.var.register("var2", [2,1])
 
     def test_variables(self):
         var = Variables()
         check = var.variables_flat()
         self.assertTrue(isinstance(check, list))
 
-        var.register("X", self.X)
+        var.register("X", [2,1])
         check = var.variables_flat()
         self.assertTrue(isinstance(check, casadi.SX))
 
@@ -41,8 +39,7 @@ class TestVariables(unittest.TestCase):
         check = var.unpacked()
         self.assertTrue(isinstance(check, casadi.SX))
 
-        Y = casadi.SX.sym("Y", 2, 1)
-        var.register("Y", Y)
+        Y = var.register("Y", [2,1])
         data0 = [[2., 1], [0., 3]]
         check = var.unpacked(data0)
         self.assertTrue(isinstance(check, np.ndarray))
@@ -63,17 +60,6 @@ class TestVariables(unittest.TestCase):
             packed = self.var.packed(data)
             self.assertTrue(packed[0][0] == 1)
 
-        with self.subTest("buggy variable decleration"):
-            """If variables var1 and var2 are not symbolic, this leads to error.
-                   Compare against packed-subtest."""
-            var = Variables()
-            var1 = casadi.SX(2, 1)
-            var.register("var1", var1)
-            var2 = casadi.SX(2, 1)
-            var.register("var2", var2)
-            data = var.unpacked([[1,2], [3,4]])
-            packed = var.packed(data)
-            self.assertFalse(packed[0][0] == 1)
 
 if __name__ == '__main__':
     unittest.main()

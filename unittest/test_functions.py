@@ -18,18 +18,15 @@ from quadratic_optimizer_elements import QuadraticOptimizerElements
 class TestFunctions(unittest.TestCase):
 
     def setUp(self):
-        self.X = casadi.SX.sym("X", 2, 1)
-        self.scenario = casadi.SX.sym("scenario")
         self.ocp = OptimizationProblem()
-        self.ocp.optvars.register("X", self.X)
-        self.ocp.scenario_parameters.register("scenario", self.scenario)
+        self.X = self.ocp.optvars.register("X", [2,1])
+        self.ocp.scenario_parameters.register("scenario")
 
     def test_function(self):
         fn = Function()
-        p = casadi.SX.sym('p')
 
         # Undefined function
-        self.ocp.problem_parameters.register('p', p)
+        p = self.ocp.problem_parameters.register('p')
         x = self.ocp.optvars.block_by_name('X')
         output = p * x
         try:
@@ -66,10 +63,8 @@ class TestFunctions(unittest.TestCase):
         self.assertTrue(np.linalg.norm(np.array(res) - np.array([[3], [2]])) < 1e-3)
 
         # Rebuild function (when problem parameter or scenario parameter have changed)
-        scenario_extended = casadi.SX.sym('scenario_extended')
-        problemp_extended = casadi.SX.sym('problemp_extended')
-        self.ocp.scenario_parameters.register('scenario_extended', scenario_extended)
-        self.ocp.problem_parameters.register('problemp_extended', problemp_extended)
+        scenario_extended = self.ocp.scenario_parameters.register('scenario_extended')
+        scenario_extended = self.ocp.problem_parameters.register('problem_extended')
 
         fn.rebuild(self.ocp.problem_parameters, self.ocp.scenario_parameters)
 

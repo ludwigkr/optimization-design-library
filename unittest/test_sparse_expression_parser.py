@@ -11,18 +11,12 @@ import sparse_expression_parser
 class TestSparseExpressionParser(unittesthelper.ParserTestCase):
     def setUp(self):
         self.op = optimizationproblem.OptimizationProblem() #
-        X = casadi.SX.sym("X", 2, 1)
-        self.op.optvars.register("X", X)
-        Y = casadi.SX.sym("Y")
-        self.op.optvars.register("Y", Y)
-        A = casadi.SX.sym("A", 2, 1)
-        self.op.problem_parameters.register("A", A)
-        B = casadi.SX.sym("B")
-        self.op.problem_parameters.register("B", B)
-        C = casadi.SX.sym("C", 2, 1)
-        self.op.scenario_parameters.register("C", C)
-        D = casadi.SX.sym("D")
-        self.op.scenario_parameters.register("D", D)
+        X = self.op.optvars.register("X", [2,1])
+        Y = self.op.optvars.register("Y")
+        A = self.op.problem_parameters.register("A", [2,1])
+        B = self.op.problem_parameters.register("B")
+        C = self.op.scenario_parameters.register("C", [2,1])
+        D = self.op.scenario_parameters.register("D")
         self.op.objective = X[0,0]**2 + X[1,0]**2
         self.op.constraints.register("c1", X[0,0] * X[1,0])
         self.op.constraints.register("c2", X[0,0] + X[1,0])

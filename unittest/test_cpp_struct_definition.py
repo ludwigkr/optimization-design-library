@@ -12,9 +12,8 @@ import cpp_struct_definition
 
 class TestCppStructDefintion(unittesthelper.ParserTestCase):
     def setUp(self):
-        X = casadi.SX.sym("X")
         self.var = variables.Variables()
-        self.var.register("X", X)
+        self.var.register("X")
 
     def test_cpp_struct_definition(self):
         result = cpp_struct_definition.cpp_struct_definition("optimization_variable", self.var)
