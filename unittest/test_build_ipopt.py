@@ -9,7 +9,6 @@ sys.path.append("../helpers")
 sys.path.append("../ipopt_builder")
 import unittesthelper
 import build_ipopt
-import quadratic_optimizer_elements
 import optimizationconfiguration as optconfig
 import optimizationsolver
 
@@ -22,7 +21,6 @@ class TestBuildIpopt(unittesthelper.ParserTestCase):
     def test_hs074(self):
         ocp = hs074.hs074_problem()
         ocp = hs074.add_hs074_build_functions(ocp)
-        quadratic_elements = quadratic_optimizer_elements.QuadraticOptimizerElements(ocp)
 
         with self.subTest("run"):        
             x_ = np.array([1., 5. , 5., 1.], dtype=float)
@@ -44,7 +42,7 @@ class TestBuildIpopt(unittesthelper.ParserTestCase):
             case_exporter.save(self.json_file_path())
 
         with self.subTest("build"):
-            self.builder.build(ocp, quadratic_elements, "./hs074_ipopt")
+            self.builder.build(ocp, "./hs074_ipopt")
             pipe = os.popen("cd hs074_ipopt && mkdir -p build && cd build && cmake .. && make -j4 && ./test_hs074")
             result = pipe.read()
             pipe.close()

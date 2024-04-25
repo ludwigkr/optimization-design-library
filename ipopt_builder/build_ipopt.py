@@ -25,8 +25,9 @@ class IpoptBuilder:
     def __init__(self) -> None:
         pass
 
-    def build(self, op: OptimizationProblem, qoe: QuadraticOptimizerElements, path:str) -> None:
+    def build(self, op: OptimizationProblem, path:str) -> None:
         op.build_lagrangian()
+        qoe = QuadraticOptimizerElements(op)
         self.build_problem_header(op, path)
         self.build_problem_source(op, qoe, path)
         self.build_interface_header(op, path)

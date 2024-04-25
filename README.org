@@ -24,7 +24,7 @@ This repository is designed to assist users with the following:
 * Workflow
 Let's see, how an optimization problem can be formulated with this library. Working examples can be found here: [[file:min_nlp_with_params/ocp_min_nlp_with_params.py]].
 
-**  Build core formulation
+** Build core formulation
 The first step is to create an =OptimizationProblem=-object in which we can save all our formulations. We also give it a name, which is used in the file names of the generated code:
 #+begin_src python
 ocp = OptimizationProblem()
