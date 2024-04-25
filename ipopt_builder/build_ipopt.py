@@ -5,12 +5,11 @@ import casadi
 import shutil
 from pathlib import Path
 
-local_folder_path = os.path.dirname(__file__)
-sys.path.append(local_folder_path + "../")
-sys.path.append(local_folder_path + "../helpers")
+local_folder_path = Path(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(str(local_folder_path.parent))
+sys.path.append(str(local_folder_path.parent) + "/helpers")
 from optimizationproblem import OptimizationProblem
 from quadratic_optimizer_elements import QuadraticOptimizerElements
-from math_helper import symetric_based_on_numeric
 import cpp_struct_definition
 import cpp_struct_functions
 import math_helper
@@ -32,11 +31,11 @@ class IpoptBuilder:
         self.build_problem_source(op, qoe, path)
         self.build_interface_header(op, path)
         self.build_interface_source(op, path)
-        shutil.copy(local_folder_path + "/ipopt_params.h", path)
-        shutil.copy(local_folder_path + "/ipopt_params.cpp", path)
+        shutil.copy(str(local_folder_path) + "/ipopt_params.h", path)
+        shutil.copy(str(local_folder_path) + "/ipopt_params.cpp", path)
 
     def build_interface_header(self, op: OptimizationProblem, path: str) -> None:
-            with open(local_folder_path + '/problem_interface.h', 'r') as f:
+            with open(str(local_folder_path) + '/problem_interface.h', 'r') as f:
                 header = f.read()
 
             class_name = path_manager.class_name(op.name)
@@ -52,7 +51,7 @@ class IpoptBuilder:
                 f.write(header)
 
     def build_interface_source(self, op: OptimizationProblem, path: str):
-            with open(local_folder_path + '/problem_interface.cpp', 'r') as f:
+            with open(str(local_folder_path) + '/problem_interface.cpp', 'r') as f:
                 source = f.read()
 
             class_name = path_manager.class_name(op.name)
@@ -69,7 +68,7 @@ class IpoptBuilder:
 
 
     def build_problem_header(self, op: OptimizationProblem, path: str) -> None:
-            with open(local_folder_path + '/problem_template.h', 'r') as f:
+            with open(str(local_folder_path) + '/problem_template.h', 'r') as f:
                 header = f.read()
             if path is None:
                 file_path = './' + op.name + "_problem_ipopt.h"
@@ -120,7 +119,7 @@ class IpoptBuilder:
                         lagrange_hessian_zeros += 1
 
 
-        with open(local_folder_path + '/problem_template.cpp', 'r') as f:
+        with open(str(local_folder_path) + '/problem_template.cpp', 'r') as f:
             source = f.read();
 
         source = source.replace("solvertemplate", op.name +"_quad_opti_qpoases")
@@ -149,7 +148,7 @@ class IpoptBuilder:
 
         source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_INDEX PLACEHOLDER*/", sparse_expression_parser.build_ipopt_index(op.lagrangian_hessian, lagrange_hessian_quadratic))
         source = source.replace("        /* LAGRANGIAN_HESSIAN_SPARSE_VALUES PLACEHOLDER*/", substitute_variables.substitute_variables(sparse_expression_parser.build_ipopt_values(op.lagrangian_hessian, lagrange_hessian_quadratic), op))
-        
+
         source = source.replace("    /*WRITE BACK SOLUTION PLACEHOLDER*/", cpp_struct_functions.assign_vector_values_to_struct_entries("x", "xopt", op.optvars, pointer=True))
 
         init_H = self.build_initH(op, qoe.objective_hessian)
