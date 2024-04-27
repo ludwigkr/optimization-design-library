@@ -30,9 +30,10 @@ def cpp_struct_definition_constructors(name: str, var: Variables) -> str:
                 ret += f"{matrix_type} _{var.names[vi]}, "
             else:
                 ret += f"{vector_type} _{var.names[vi]}, "
-            if ret[-2:] == ', ':
-                ret = ret[:-2]
-            ret += "):\n"
+
+        if ret[-2:] == ', ':
+            ret = ret[:-2]
+        ret += "):\n"
 
         for vi, v in enumerate(var.variables):
             ret += "        " + var.names[vi] + "(_" + var.names[vi] + "),\n"
@@ -47,7 +48,8 @@ def cpp_struct_definition_constructors(name: str, var: Variables) -> str:
                 ret += f"          {var.names[vi]} = {matrix_type}({v.size(1)},{v.size(2)});\n"
             else:
                 ret += f"          {var.names[vi]} = {vector_type}({v.size(1)*v.size(2)});\n"
-            ret += "}\n"
+
+        ret += "}\n"
 
     return ret
 

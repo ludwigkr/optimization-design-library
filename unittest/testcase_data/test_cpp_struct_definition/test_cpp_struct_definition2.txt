@@ -1,0 +1,26 @@
+struct optimization_variable{
+    float X;
+    Eigen::VectorXd Y;
+    Eigen::VectorXd Z;
+    Eigen::MatrixXd W;
+
+    optimization_variable(float _X, Eigen::VectorXd _Y, Eigen::VectorXd _Z, Eigen::MatrixXd _W):
+        X(_X),
+        Y(_Y),
+        Z(_Z),
+        W(_W){}
+
+    optimization_variable(){
+          Y = Eigen::VectorXd(2);
+          Z = Eigen::VectorXd(2);
+          W = Eigen::MatrixXd(2,2);
+}
+    float norm() {
+        float ret = 0;
+        ret += powf(X, 2);
+        ret += Y.transpose() * Y;
+        ret += Z.transpose() * Z;
+        ret += W.cwiseProduct(W).sum();
+        return sqrt(ret);
+    }
+};
