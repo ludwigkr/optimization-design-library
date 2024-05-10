@@ -1,0 +1,15 @@
+{
+    "cmake.sourceDirectory": "${workspaceFolder}/cpp_test",
+    "python.autoComplete.extraPaths": [
+        "helpers",
+        "unittest",
+        "ipopt_builder",
+        "openmodelica_parser"
+    ],
+    "python.analysis.extraPaths": [
+        "helpers",
+        "unittest",
+        "ipopt_builder",
+        "openmodelica_parser"
+    ]
+}

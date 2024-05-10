@@ -27,7 +27,7 @@ class TestFunctions(unittest.TestCase):
 
         # Undefined function
         p = self.ocp.problem_parameters.register('p')
-        x = self.ocp.optvars.block_by_name('X')
+        x = self.ocp.optvars.variables_by_names('X')
         output = p * x
         try:
             fn.build('fn', self.ocp.problem_parameters, self.ocp.scenario_parameters, output)
@@ -36,7 +36,7 @@ class TestFunctions(unittest.TestCase):
             self.assertFalse(False)
 
        # Proper function
-        scenario = self.ocp.scenario_parameters.block_by_name('scenario')
+        scenario = self.ocp.scenario_parameters.variables_by_names('scenario')
         output = p * scenario
         try:
             fn.build('fn', self.ocp.problem_parameters, self.ocp.scenario_parameters, output)

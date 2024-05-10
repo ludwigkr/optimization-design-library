@@ -55,19 +55,36 @@ class TestVariables(ParserTestCase):
         data0 = np.array([2., 1, 0, 4])
         check = var.packed(data0)
 
+    def test_unpacked(self):
+        v = Variables()
+        v.register('a')
+        v.register('b', 2)
+
+        res = v.unpacked([1, [1,2]])
+        self.assertTrue(True)
+
     def test_assign_values(self):
         with self.subTest("packed"):
             data = self.var.unpacked([[1,2], [3,4]])
             packed = self.var.packed(data)
             self.assertTrue(packed[0][0] == 1)
 
-    def test_block_by_name(self):
-        result = str(self.var.block_by_name('var2'))
+    def test_variables_by_names(self):
+        with self.subTest("with_string_argument"):
+            result = str(self.var.variables_by_names('var2'))
+
+        with self.subTest("with_list_arguments"):
+            self.var.register("var3", [2,1])
+            result += str(self.var.variables_by_names(['var2', 'var3']))
+
+        with self.subTest("non existing argument"):
+            self.assertRaises(AssertionError, self.var.variables_by_names, "var4")
 
         reference = self.load_reference()
         self.save_reference(result)
         if reference:
             self.assertTrue(result == reference)
+
 
 if __name__ == '__main__':
     unittest.main()

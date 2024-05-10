@@ -2,6 +2,7 @@
 import casadi
 from casadi import SX, DM
 import numpy as np
+import itertools
 
 class Variables:
     def __init__(self):
@@ -33,10 +34,18 @@ class Variables:
         self.names.append(name)
         return new_vars
 
-    def block_by_name(self, name):
-        assert(name in self.names)
-        idx = self.idxs[name]
+    def variables_by_names(self, names):
+        if type(names) == str:
+            assert(names in self.names)
+            idx = self.idxs[names]
+        else:
+            idx = []
+            for n in names:
+                assert(n in self.names)
+                idx.append(self.idxs[n].tolist())
+            idx = np.array(idx).reshape([-1]).tolist()
         return self.variables_flat()[idx]
+
 
     def variables_flat(self):
         """Function to get the symbolic vector in mathematical form."""
@@ -52,7 +61,7 @@ class Variables:
             if type(variables) != list and type(variables) != np.ndarray:
                 return np.array([float(variables)])
             else:
-                if type(variables[0]) != list and type(variables[0]) != np.ndarray:
+                if len(variables) == 0 and type(variables[0]) != list and type(variables[0]) != np.ndarray:
                     return np.array(variables).reshape(-1, 1)
                 else:
                     ret = np.array(variables[0]).reshape(-1, 1)
@@ -83,5 +92,3 @@ if __name__ == "__main__":
 
 
     unittest.main()
-
-

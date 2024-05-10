@@ -94,3 +94,17 @@ class OptimizationProblem:
 
         self.lagrangian_jacobian = casadi.jacobian(self.lagrangian, self.optvars.variables_flat())
         self.lagrangian_hessian = casadi.jacobian(self.lagrangian_jacobian, self.optvars.variables_flat())
+
+    def __str__(self):
+        ret  = f"{self.name}" + "\n"
+        ret += f"{self.version}" + "\n"
+        ret += f"minimize: {self.objective}" + "\n"
+        ret += f"xopt: {self.optvars.variables_flat()}" + "\n"
+        ret += f"prob_param: {self.problem_parameters.variables_flat()}" + "\n"
+
+
+        ret += f"s.t.:" + "\n"
+        for e in self.constraints.equations:
+            ret += f"    {e}" + "\n"
+
+        return ret

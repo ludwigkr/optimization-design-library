@@ -1,0 +1,13 @@
+class oscillator
+  parameter Real mass2.m(quantity = "Mass", unit = "kg", min = 0.0, start = 1.0) = 1.0 "Mass of the sliding mass";
+  parameter Real spring2.c(quantity = "TranslationalSpringConstant", unit = "N/m", min = 0.0, start = 1.0) = 10000.0 "Spring constant";
+  parameter Real damper1.d(quantity = "TranslationalDampingConstant", unit = "N.s/m", min = 0.0, start = 0.0) = 10.0 "Damping constant";
+  Real mass2.s(quantity = "Length", unit = "m", start = -0.5, fixed = true, stateSelect = StateSelect.default) "Absolute position of center of component (s = flange_a.s + L/2 = flange_b.s - L/2)";
+  Real mass2.v(quantity = "Velocity", unit = "m/s", start = 0.0, fixed = true, stateSelect = StateSelect.default) "Absolute velocity of component";
+  Real mass2.a(quantity = "Acceleration", unit = "m/s2", start = 0.0) "Absolute acceleration of component";
+  Real force2.f(unit = "N") "Driving force as input signal";
+equation
+  mass2.v = der(mass2.s);
+  mass2.a = der(mass2.v);
+  mass2.m * mass2.a = force2.f + spring2.c * mass2.s - damper1.d * mass2.v
+end oscillator;
