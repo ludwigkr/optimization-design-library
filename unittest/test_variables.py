@@ -6,8 +6,9 @@ import numpy as np
 import sys
 sys.path.append("..")
 from variables import Variables
+from unittesthelper import ParserTestCase
 
-class TestVariables(unittest.TestCase):
+class TestVariables(ParserTestCase):
 
     def setUp(self):
         self.X = casadi.SX.sym("X", 2, 1)
@@ -60,6 +61,13 @@ class TestVariables(unittest.TestCase):
             packed = self.var.packed(data)
             self.assertTrue(packed[0][0] == 1)
 
+    def test_block_by_name(self):
+        result = str(self.var.block_by_name('var2'))
+
+        reference = self.load_reference()
+        self.save_reference(result)
+        if reference:
+            self.assertTrue(result == reference)
 
 if __name__ == '__main__':
     unittest.main()

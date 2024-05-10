@@ -35,7 +35,8 @@ class Variables:
 
     def block_by_name(self, name):
         assert(name in self.names)
-        return self.variables[self.idxs[name][0, 0]]
+        idx = self.idxs[name]
+        return self.variables_flat()[idx]
 
     def variables_flat(self):
         """Function to get the symbolic vector in mathematical form."""
