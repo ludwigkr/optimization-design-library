@@ -11,12 +11,11 @@ class Variables:
         self.variables = [] # list of variables in blocks
         self.names = []
 
-    def __update_index(self, new_vars: casadi.SX):
-        """Based on the new opimization variables optvars, determines their indices optvars_idxs and returns the updated total amount of optimizatin variables (which is seen for further optimization variables as prev_variable index) prev_n."""
-        optvars_idxs = np.linspace(0, new_vars.size1() * new_vars.size2() - 1, new_vars.size1() * new_vars.size2(), dtype=int) + self.n_vars
-        self.n_vars += new_vars.size1() * new_vars.size2()
-
-        return optvars_idxs.reshape((new_vars.size1(), new_vars.size2()), order='F')
+    def __str__(self) -> str:
+        ret = ""
+        for n, name in enumerate(self.names):
+            ret += f"{name}{self.variables[n].size()}: {np.array(self.idxs[name]).reshape(-1).tolist()}\n"
+        return ret
 
     def register(self, name:str, dim=None):
         if type(dim) == int:
@@ -33,6 +32,29 @@ class Variables:
         self.variables.append(new_vars)
         self.names.append(name)
         return new_vars
+
+    def __update_index(self, new_vars: casadi.SX):
+        """Based on the new opimization variables optvars, determines their indices optvars_idxs and returns the updated total amount of optimizatin variables (which is seen for further optimization variables as prev_variable index) prev_n."""
+        optvars_idxs = np.linspace(0, new_vars.size1() * new_vars.size2() - 1, new_vars.size1() * new_vars.size2(), dtype=int) + self.n_vars
+        self.n_vars += new_vars.size1() * new_vars.size2()
+
+        return optvars_idxs.reshape((new_vars.size1(), new_vars.size2()), order='F')
+
+    def remove(self, name:str):
+        if name in self.idxs:
+            del self.idxs[name]
+            i = [i for i in range(len(self.names)) if self.names[i] == name][0]
+            del self.variables[i]
+            del self.names[i]
+        
+        self.__reindex()
+
+    def __reindex(self):
+        self.n_vars = 0
+        for n in range(len(self.names)):
+            name = self.names[n]
+            self.idxs[name] = self.__update_index(self.variables[n])
+
 
     def variables_by_names(self, names):
         if type(names) == str:

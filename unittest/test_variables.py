@@ -85,6 +85,17 @@ class TestVariables(ParserTestCase):
         if reference:
             self.assertTrue(result == reference)
 
+    def test_remove(self):
+        self.var.register('var3',3)
+        self.var.remove('var1')
+        self.assertTrue(len(self.var.idxs) == 2)
+        self.assertTrue(len(self.var.names) == 2)
+        self.assertTrue(len(self.var.variables) == 2)
+        self.assertTrue(np.all(self.var.idxs['var2'] == np.array([[0],[1]])))
+        self.assertTrue(np.all(self.var.idxs['var3'] == np.array([[2],[3], [4]])))
+        self.assertTrue(self.var.n_vars == 5)
+
+
 
 if __name__ == '__main__':
     unittest.main()
