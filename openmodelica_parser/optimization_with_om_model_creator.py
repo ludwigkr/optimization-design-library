@@ -21,7 +21,7 @@ def read_model(model_path):
 
 
 
-def create_op_variables(model_parser: ModelParser, model_inputs: [str], K: int):
+def create_op_variables(model_parser: ModelParser, model_inputs: [str], K: int, params_as_vars=False):
     model_inputs = [u.replace(".", "_") for u in model_inputs]
     op = OptimizationProblem()
     model_x = variables.Variables()
@@ -37,7 +37,10 @@ def create_op_variables(model_parser: ModelParser, model_inputs: [str], K: int):
             model_x.register(xopt)
 
     for param in model_parser.parameters:
-        op.problem_parameters.register(param)
+        if params_as_vars:
+            op.optvars.register(param)
+        else:
+            op.problem_parameters.register(param)
         model_params.register(param)
 
     if len(model_inputs) > 0:
@@ -47,10 +50,10 @@ def create_op_variables(model_parser: ModelParser, model_inputs: [str], K: int):
     return op, model_vars
 
 
-def create_op_with_om_model(model_path, model_inputs, dt:float, K:int):
+def create_op_with_om_model(model_path, model_inputs, dt:float, K:int, params_as_vars=False):
     model_text = read_model(model_path)
     model_parser = ModelParser(model_text)
-    op, model_vars = create_op_variables(model_parser, model_inputs, K)
+    op, model_vars = create_op_variables(model_parser, model_inputs, K, params_as_vars)
 
     for ode in model_parser.odes:
         sites = ode.split(" = ")
@@ -65,11 +68,21 @@ def create_op_with_om_model(model_path, model_inputs, dt:float, K:int):
 
     X = op.optvars.variables_by_names(model_vars.X.names).reshape((-1,model_vars.X.n_vars)).T
     U = op.optvars.variables_by_names(model_vars.U.names).reshape((-1,model_vars.U.n_vars)).T
-    Params = op.problem_parameters.variables_flat()
+    if params_as_vars:
+        Params = op.optvars.variables_by_names(model_vars.params.names).reshape((-1,model_vars.params.n_vars)).T
+    else:
+        Params = op.problem_parameters.variables_flat()
+
     for eq in model_parser.equations:
         [eq_lh, eq_rh] = eq.split(" = ")
+
         eq_rh_func = parse_om_function_to_casadi(model_vars, eq_rh)
+        print(f"{eq_rh}")
+        print(eq_rh_func(X[:,:-1], U, Params))
+
         eq_lh_func = parse_om_function_to_casadi(model_vars, eq_lh)
+        print(f"{eq_lh}")
+        print(eq_lh_func(X[:,:-1], U, Params))
         constraint = eq_lh_func(X[:,:-1], U, Params) - eq_rh_func(X[:,:-1], U, Params)
         op.constraints.register(eq, constraint)
 
