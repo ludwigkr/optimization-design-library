@@ -20,15 +20,15 @@ class TestFunctions(unittest.TestCase):
     def setUp(self):
         self.ocp = OptimizationProblem()
         self.X = self.ocp.optvars.register("X", [2,1])
-        self.ocp.scenario_parameters.register("scenario")
+        self.ocp.scenario_parameters.register("scenario1")
 
     def test_function(self):
         fn = Function()
 
         # Undefined function
-        p = self.ocp.problem_parameters.register('p')
+        param1 = self.ocp.problem_parameters.register('param1')
         x = self.ocp.optvars.variables_by_names('X')
-        output = p * x
+        output = param1 * x
         try:
             fn.build('fn', self.ocp.problem_parameters, self.ocp.scenario_parameters, output)
             self.assertFalse(True)
@@ -36,8 +36,8 @@ class TestFunctions(unittest.TestCase):
             self.assertFalse(False)
 
        # Proper function
-        scenario = self.ocp.scenario_parameters.variables_by_names('scenario')
-        output = p * scenario
+        scenario1 = self.ocp.scenario_parameters.variables_by_names('scenario1')
+        output = param1 * scenario1
         try:
             fn.build('fn', self.ocp.problem_parameters, self.ocp.scenario_parameters, output)
             self.assertTrue(True)
@@ -52,7 +52,7 @@ class TestFunctions(unittest.TestCase):
         self.assertTrue(res == 2)
 
         # Overwrite function
-        output = [scenario+p, scenario*p]
+        output = [scenario1+param1, scenario1*param1]
         try:
             fn.build('fn', self.ocp.problem_parameters, self.ocp.scenario_parameters, output)
             self.assertTrue(True)

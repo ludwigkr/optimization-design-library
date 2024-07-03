@@ -28,10 +28,18 @@ class Variables:
             raise RuntimeError("Wrong dimensionn type.")
         assert(type(new_vars) == casadi.casadi.SX)
         assert(type(name) == str)
+        assert(self.__valid_variable_name(name))
         self.idxs[name] = self.__update_index(new_vars)
         self.variables.append(new_vars)
         self.names.append(name)
         return new_vars
+
+    def __valid_variable_name(self, name):
+        keywords = ['double', 'float', 'optvars', 'xopt', 'prob_param', 'param', 'lamg', 'scenario']
+        for k in keywords:
+            if name in k:
+                return False
+        return True
 
     def __update_index(self, new_vars: casadi.SX):
         """Based on the new opimization variables optvars, determines their indices optvars_idxs and returns the updated total amount of optimizatin variables (which is seen for further optimization variables as prev_variable index) prev_n."""

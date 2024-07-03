@@ -57,8 +57,8 @@ class TestVariables(ParserTestCase):
 
     def test_unpacked(self):
         v = Variables()
-        v.register('a')
-        v.register('b', 2)
+        v.register('A')
+        v.register('B', 2)
 
         res = v.unpacked([1, [1,2]])
         self.assertTrue(True)
@@ -68,6 +68,9 @@ class TestVariables(ParserTestCase):
             data = self.var.unpacked([[1,2], [3,4]])
             packed = self.var.packed(data)
             self.assertTrue(packed[0][0] == 1)
+
+    def test_inalid_variable_names(self):
+        self.assertRaises(AssertionError, self.var.register, 'a')
 
     def test_variables_by_names(self):
         with self.subTest("with_string_argument"):
