@@ -28,6 +28,7 @@ def replace_pattern_for_substitute_variable_in_struct(struct_name: str, link_sym
     var_is_matrix = np.array(vars_idx).shape[0] > 1 and np.array(vars_idx).shape[1] > 1
     if var_is_matrix:
         var_idx = np.where(vars_idx == n)
+        var_idx = np.array(var_idx).reshape([-1]).tolist()
         replace_pattern = f"{struct_name}{link_symbol}{var}({int(var_idx[0])},{int(var_idx[1])})"
     else:
         replace_pattern = struct_name + link_symbol + var + "[" + str(n) + "]"

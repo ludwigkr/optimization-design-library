@@ -20,6 +20,10 @@ optimized_variable operator-(const optimized_variable& left, const optimized_var
 
 using namespace Ipopt;
 
+// Solve min f(x)
+// s.t. lg <= g(x) <= ug
+//      lx <=  x   <= ux
+
 class ProblemFormulation: public TNLP {
 public:
     ProblemFormulation(scenario_parameter *s, problem_parameter *p, optimized_variable *x) {

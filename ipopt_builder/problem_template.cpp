@@ -39,7 +39,7 @@ bool ProblemFormulation::get_bounds_info(Index n, Number *x_l, Number *x_u, Inde
 
     /* UBX PLACEHOLDER*/
 
-    /* LBG PLACEHOLDER*/
+    /* LOWER CONSTRAINTS BOUND PLACEHOLDER*/
 
     /* UBG PLACEHOLDER*/
 
