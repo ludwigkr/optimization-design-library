@@ -2,7 +2,7 @@
 [[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittests-core.yml/badge.svg]]
 [[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittest-ocps.yml/badge.svg]]
 
-* Why Choose This Library?
+* Why this library?
 
 This repository is designed to assist users with the following:
 
@@ -17,12 +17,24 @@ This repository is designed to assist users with the following:
 - Reducing the package size and minimizing dependencies.
 - Enhancing the readability and verifiability of the generated code.
 
+* Features
+- Easily create optimization problems in python
+- Solve the optimization problem in python using casadi (and ipopt as solver)
+- Export optimization problem to cpp
+- Export test cases to json
+- Solve optimation problems in cpp using ipopt as solver
+- Automatically compare test case results between python and cpp version
+
+- Read model from open-modelica (exportet flat models)
+  - Helper to build ocp with importet model
+
+
 * Variable overview
 
 [[file:doc/variable-process-overview.svg]]
 
 * Workflow
-Let's see, how an optimization problem can be formulated with this library. Working examples can be found here: [[file:min_nlp_with_params/ocp_min_nlp_with_params.py]].
+Let's see, how an optimization problem can be formulated with this library.
 
 ** Build core formulation
 The first step is to create an =OptimizationProblem=-object in which we can save all our formulations. We also give it a name, which is used in the file names of the generated code:
