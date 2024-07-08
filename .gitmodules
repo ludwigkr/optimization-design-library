@@ -1,3 +1,7 @@
 [submodule "cpp/json"]
 	path = cpp/json
 	url = https://github.com/nlohmann/json.git
+[submodule "pybind11"]
+	path = pybind11_builder/pybind11
+	url = https://github.com/pybind/pybind11.git
+	branch = stable

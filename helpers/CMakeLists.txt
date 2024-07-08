@@ -1,11 +1,10 @@
-project("hs074")
+project("<problem_name>")
 cmake_minimum_required(VERSION 3.0)
 
 # add_compile_definitions("-g")
 set(CMAKE_BUILD_TYPE Debug)
 
-add_subdirectory(../../pybind11_builder/pybind11 ..)
-
+add_subdirectory(../optimization-design-library/pybind11_builder/pybind11 ..)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(EIGEN3 REQUIRED eigen3)
@@ -21,22 +20,22 @@ link_directories("/usr/lib")
 set(SOURCE_FILES_IPOPT_RUN
     main.cpp
     ../../../optimization-design-library/cpp/test_case_importer.cpp
-    hs074_interface.cpp
-    hs074_problem_ipopt.cpp
+    <problem_name>_interface.cpp
+    <problem_name>_problem_ipopt.cpp
     ipopt_params.cpp)
 
 set(SOURCE_FILES_IPOPT_UNITTEST
     test_main.cpp
-    hs074_test.cpp
+    <problem_name>_test.cpp
     ../../../optimization-design-library/cpp/test_case_importer.cpp
-    hs074_interface.cpp
-    hs074_problem_ipopt.cpp
+    <problem_name>_interface.cpp
+    <problem_name>_problem_ipopt.cpp
     ipopt_params.cpp)
 
 set(SOURCE_FILES_IPOPT_PYBIND11
-    hs074_pybind11.cpp
-    hs074_interface.cpp
-    hs074_problem_ipopt.cpp
+    <problem_name>_pymodule.cpp
+    <problem_name>_interface.cpp
+    <problem_name>_problem_ipopt.cpp
     ipopt_params.cpp
 )
 

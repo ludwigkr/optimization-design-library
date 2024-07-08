@@ -1,0 +1,36 @@
+#+title: Pybind11
+
+* Manually build
+A submodule of bybind is also in this repo.
+
+#+begin_src sh
+git clone --recursive https://github.com/pybind/pybind11.git
+cd pybind11
+mkdir -p build
+cd build
+cmake ..
+make -j11
+#+end_src
+
+If the build-process cannot find the python path (e.g. because you are using pyenv), you need to specify it in the =pybind11/CMakeLists.txt=:
+#+begin_src cmake
++set (PYTHON_EXECUTABLE "/home/$USER/.pyenv/versions/3.11.2/bin/python")
+#+end_src
+
+The path to add to you =CMakeLists.txt= is the project dir:
+#+begin_src cmake
+add_subdirectory(../optimization-design-library/pybind11_builder/pybind11 ..)
+#+end_src
+
+* Install via pip
+
+#+begin_src sh
+pip install pybind11[global]
+#+end_src
+
+You find the path to add to your =CMakeLists.txt= with:
+
+#+begin_src python
+import pybind11
+print(pybind11.get_cmake_dir())
+#+end_src
