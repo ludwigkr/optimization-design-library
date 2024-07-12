@@ -17,10 +17,21 @@ class TestFlatOMModelImporter(unittest.TestCase):
 
         parser = ModelParser(model_text)
         self.assertTrue(len(parser.equations) == 26)
-        self.assertTrue(len(parser.variables) == 27)
+        self.assertTrue(len(parser.variables) == 28)
         self.assertTrue(len(parser.parameters) == 8)
         pass
 
+    def test_parse_PT1(self):
+        oscillator_path = "./testdata/PT1.txt"
+
+        with open(oscillator_path, "r") as f:
+            model_text = f.read()
+
+        parser = ModelParser(model_text)
+        self.assertTrue(len(parser.equations) == 1)
+        self.assertTrue(len(parser.odes) == 1)
+        self.assertTrue(len(parser.variables) == 3)
+        self.assertTrue(len(parser.parameters) == 3)
 
 if __name__ == "__main__":
     unittest.main()

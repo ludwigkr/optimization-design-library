@@ -1,0 +1,11 @@
+class PT1
+  parameter Real T;
+  parameter Real K:
+  parameter Real u0;
+  Real y;
+  Real x;
+  Real u;
+equation
+  der(x) = 1/T * x + K/T * (u - u0);
+  y = x;
+end PT1;

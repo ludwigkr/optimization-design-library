@@ -20,7 +20,11 @@ class ModelParser:
         def parse_parameter_lines(parameter_lines) -> [str]:
             params = []
             for p in parameter_lines:
-                params.append(p[17:].split("(")[0])
+                if "(" in p:
+                    params.append(p[17:].split("(")[0])
+                else:
+                    params.append(p[17:-1])
+            
 
             return params
 
@@ -40,6 +44,13 @@ class ModelParser:
             for v in variable_lines:
                 if "(" in v:
                     vars.append(v[7:].split("(")[0])
+                else:
+                    words = v.split(" ")
+                    words = [w for w in words if w != '']
+                    var = words[1]
+                    if var[-1] == ';':
+                        var = var[:-1]
+                    vars.append(var)
 
             return vars
 
