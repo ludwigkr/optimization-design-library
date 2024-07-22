@@ -8,9 +8,9 @@ sys.path.append("..")
 sys.path.append("../openmodelica_parser")
 from variables import Variables
 from model_variables import ModelVariables
-from parse_om_function_to_casadi import parse_om_function_to_casadi
+from parse_to_casadi_function import parse_to_casadi_function
 
-class TestParseOMFunctionToCasadi(unittest.TestCase):
+class TestParseToCasadiFunction(unittest.TestCase):
     def setUp(self):
         self.x = Variables()
         self.x.register('value_b')
@@ -18,16 +18,19 @@ class TestParseOMFunctionToCasadi(unittest.TestCase):
         self.u = Variables()
         self.params = Variables()
         self.params.register('value_c')
-        self.model_vars = ModelVariables(self.x, self.u, self.params)
+        self.model_vars = ModelVariables()
+        self.model_vars.states = self.x
+        self.model_vars.inputs = self.u
+        self.model_vars.parameters = self.params
 
     def test_parse_om_function_to_casadi(self):
-        func = parse_om_function_to_casadi(self.model_vars, "value_c * (value_b - value_a);")
+        func = parse_to_casadi_function(self.model_vars, "value_c * (value_b - value_a);")
         self.assertTrue(type(func) == casadi.Function)
-        func = parse_om_function_to_casadi(self.model_vars, "value_c * (value_b - value_a)")
+        func = parse_to_casadi_function(self.model_vars, "value_c * (value_b - value_a)")
         self.assertTrue(type(func) == casadi.Function)
 
     def test_parse_function_with_numbers_to_casadi(self):
-        func = parse_om_function_to_casadi(self.model_vars, "value_c * (2./value_b - value_a);")
+        func = parse_to_casadi_function(self.model_vars, "value_c * (2./value_b - value_a);")
         x = self.x.unpacked([1,0.3])
         u = []
         p = self.params.unpacked([0.4])
@@ -36,7 +39,7 @@ class TestParseOMFunctionToCasadi(unittest.TestCase):
         self.assertTrue(type(func) == casadi.Function)
 
     def test_om_function_features(self):
-        func = parse_om_function_to_casadi(self.model_vars, "value_c * (value_b - value_a)")
+        func = parse_to_casadi_function(self.model_vars, "value_c * (value_b - value_a)")
 
         with self.subTest("Vector handling"):
             # Each new state gets it's own row

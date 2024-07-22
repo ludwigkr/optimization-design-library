@@ -8,11 +8,11 @@ sys.path.append("..")
 sys.path.append("../openmodelica_parser")
 
 from variables import Variables
-from optimization_with_om_model_creator import create_op_with_om_model
+from optimization_problem_from_modelica_model import optimization_problem_from_modelica_model
 import optimizationconfiguration as optconfig
 import optimizationsolver
 
-class TestOptimizationWithOMModelCreator(unittest.TestCase):
+class TestOptimizationProblemFromModelicaModel(unittest.TestCase):
     def setUp(self) -> None:
         return super().setUp()
 
@@ -22,7 +22,7 @@ class TestOptimizationWithOMModelCreator(unittest.TestCase):
         dt = 0.1
         K = 10
 
-        op = create_op_with_om_model(file_path, model_inputs, dt=dt, K=K)
+        op = optimization_problem_from_modelica_model(file_path, model_inputs, dt=dt, K=K)
         self.assertTrue(op.constraints.n_constraints == 2*(K-1) + (K-1))
         self.assertTrue(op.optvars.n_vars == 3*K + 1*(K-1))
         self.assertTrue(op.problem_parameters.n_vars == 3)

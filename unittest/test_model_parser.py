@@ -2,7 +2,7 @@ import unittest
 import sys
 
 sys.path.append("../openmodelica_parser")
-from flat_om_model_importer import ModelParser
+from model_parser import ModelParser
 
 
 class TestFlatOMModelImporter(unittest.TestCase):
@@ -16,9 +16,10 @@ class TestFlatOMModelImporter(unittest.TestCase):
             model_text = f.read()
 
         parser = ModelParser(model_text)
-        self.assertTrue(len(parser.equations) == 26)
-        self.assertTrue(len(parser.variables) == 28)
-        self.assertTrue(len(parser.parameters) == 8)
+        self.assertTrue(len(parser.equations.constraints) == 26)
+        self.assertTrue(len(parser.equations.odes) == 3)
+        self.assertTrue(len(parser.variables.states) == 29)
+        self.assertTrue(len(parser.variables.parameters) == 12)
         pass
 
     def test_parse_PT1(self):
@@ -28,10 +29,10 @@ class TestFlatOMModelImporter(unittest.TestCase):
             model_text = f.read()
 
         parser = ModelParser(model_text)
-        self.assertTrue(len(parser.equations) == 1)
-        self.assertTrue(len(parser.odes) == 1)
-        self.assertTrue(len(parser.variables) == 3)
-        self.assertTrue(len(parser.parameters) == 3)
+        self.assertTrue(len(parser.equations.constraints) == 1)
+        self.assertTrue(len(parser.equations.odes) == 1)
+        self.assertTrue(len(parser.variables.states) == 3)
+        self.assertTrue(len(parser.variables.parameters) == 3)
 
 if __name__ == "__main__":
     unittest.main()

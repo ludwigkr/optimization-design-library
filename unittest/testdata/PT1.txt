@@ -1,4 +1,4 @@
-class PT1
+model PT1
   parameter Real T;
   parameter Real K:
   parameter Real u0;
