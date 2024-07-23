@@ -62,9 +62,9 @@ class ModelVariables:
     def determin_variable_type(self, variable_line):
         if 'parameter' in variable_line:
             return 'param'
-        elif "Modelica_Blocks_Interfaces_RealInput" in variable_line:
+        elif "Modelica.Blocks.Interfaces.RealInput" in variable_line:
             return 'input'
-        elif "Modelica_Blocks_Interfaces_RealOutput" in variable_line:
+        elif "Modelica.Blocks.Interfaces.RealOutput" in variable_line:
             return 'output'
         else:
             return 'state'

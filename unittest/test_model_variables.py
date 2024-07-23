@@ -65,6 +65,18 @@ class TestModelVariables(unittest.TestCase):
             self.assertTrue(len(parser.states) == 2)
             self.assertTrue(len(parser.parameters) == 3)
 
+    def test_parse_PT1v2(self):
+        oscillator_path = "./testdata/PT1v2.mo"
+
+        with open(oscillator_path, "r") as f:
+            model_text = f.read()
+
+        parser = ModelVariables(model_text.split("\n"))
+        self.assertTrue(len(parser.inputs) == 1)
+        self.assertTrue(len(parser.outputs) == 1)
+        self.assertTrue(len(parser.states) == 1)
+        self.assertTrue(len(parser.parameters) == 3)
+
 
 if __name__ == "__main__":
     unittest.main()
