@@ -51,5 +51,17 @@ class TestParseToCasadiFunction(unittest.TestCase):
             error = np.linalg.norm(np.array([1., 0.5]) - result)
             self.assertTrue( error < 1e-3)
 
+    def test_dynamic_of_PT1v2(self):
+        model_vars = ModelVariables()
+        model_vars.parameters = ['T11', 'K11', 'u0_11']
+        model_vars.inputs = ['u1']
+        model_vars.states = ['x11']
+        model_vars.convert_variables_to_symbolics()
+        func = parse_to_casadi_function(model_vars, "-1.0 / T11 * x11 + K11 / T11 * (u1 + u0_11);")
+        ret = func(1, 2, np.array([3,4,5]))
+        self.assertTrue(ret is not np.nan)
+        pass
+
+
 if __name__ == "__main__":
     unittest.main()

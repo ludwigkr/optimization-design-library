@@ -77,6 +77,21 @@ class TestModelVariables(unittest.TestCase):
         self.assertTrue(len(parser.states) == 1)
         self.assertTrue(len(parser.parameters) == 3)
 
+        with self.subTest("test outputs are states"):
+            parser.outputs_are_states()
+            self.assertTrue(len(parser.inputs) == 1)
+            self.assertTrue(len(parser.outputs) == 0)
+            self.assertTrue(len(parser.states) == 2)
+            self.assertTrue(len(parser.parameters) == 3)
+
+        with self.subTest("test parameters are states"):
+            parser.parameters_are_states()
+            self.assertTrue(len(parser.inputs) == 1)
+            self.assertTrue(len(parser.outputs) == 0)
+            self.assertTrue(len(parser.states) == 5)
+            self.assertTrue(len(parser.parameters) == 0)
+
+
 
 if __name__ == "__main__":
     unittest.main()

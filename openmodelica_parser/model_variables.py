@@ -62,9 +62,9 @@ class ModelVariables:
     def determin_variable_type(self, variable_line):
         if 'parameter' in variable_line:
             return 'param'
-        elif "Modelica.Blocks.Interfaces.RealInput" in variable_line:
+        elif "Modelica.Blocks.Interfaces.RealInput" in variable_line or "Modelica_Blocks_Interfaces_RealInput" in variable_line:
             return 'input'
-        elif "Modelica.Blocks.Interfaces.RealOutput" in variable_line:
+        elif "Modelica.Blocks.Interfaces.RealOutput" in variable_line or "Modelica_Blocks_Interfaces_RealOutput" in variable_line:
             return 'output'
         else:
             return 'state'
@@ -98,6 +98,20 @@ class ModelVariables:
 
         if len(inputs_list) > 0:
             raise(Warning(f"Not all inputs found in states. The following are not found: {inputs_list}"))
+
+    def outputs_are_states(self):
+        if type(self.states) == list:
+            self.states += self.outputs
+            self.outputs = []
+        else:
+            raise(Warning("Variable names are already convertet to symbolics"))
+
+    def parameters_are_states(self):
+        if type(self.parameters) == list:
+            self.states += self.parameters
+            self.parameters = []
+        else:
+            raise(Warning("Variable names are already convertet to symbolics"))
 
     def convert_variables_to_symbolics(self):
 

@@ -29,7 +29,7 @@ def create_optimizaiton_problem_with_variables(model_parser: ModelParser, K: int
 
     return op
 
-def add_odes_constraints(op, model_parser: ModelParser, dt):
+def add_odes_constraints(op: OptimizationProblem, model_parser: ModelParser, dt, params_as_vars: bool):
     for ode in model_parser.equations.odes:
         sites = ode.split(" = ")
         if 'der(' in sites[1]:
@@ -37,15 +37,21 @@ def add_odes_constraints(op, model_parser: ModelParser, dt):
 
         ode_variable = sites[0].replace('der(', '').replace(")", "")
         ode_equation = sites[1]
-        constr = mk2(ode_variable, ode_equation, op, model_parser, dt)
+        constr = mk2(ode_variable, ode_equation, op, model_parser, dt, params_as_vars=params_as_vars)
 
         op.constraints.register(sites[0], constr)
 
     return op
 
-def add_constraint_equations(op, model_parser: ModelParser, params_as_vars):
-    X = op.optvars.variables_by_names(model_parser.variables.states.names).reshape((-1,model_parser.variables.states.n_vars)).T
-    U = op.optvars.variables_by_names(model_parser.variables.inputs.names).reshape((-1,model_parser.variables.inputs.n_vars)).T
+def add_constraint_equations(op: OptimizationProblem, model_parser: ModelParser, params_as_vars: bool):
+    X = op.optvars.variables_by_names(model_parser.variables.states.names)
+    if model_parser.variables.states.n_vars > 0:
+        X = X.reshape((-1,model_parser.variables.states.n_vars)).T
+
+    U = op.optvars.variables_by_names(model_parser.variables.inputs.names)
+    if model_parser.variables.inputs.n_vars > 0:
+        U = U.reshape((-1,model_parser.variables.inputs.n_vars)).T
+
     if params_as_vars:
         Params = op.optvars.variables_by_names(model_parser.variables.parameters.names).reshape((-1,model_parser.variables.parameters.n_vars)).T
     else:
@@ -62,15 +68,16 @@ def add_constraint_equations(op, model_parser: ModelParser, params_as_vars):
     return op
 
 
-def optimization_problem_from_modelica_model(model_path, model_inputs, dt:float, K:int, params_as_vars=False):
+def optimization_problem_from_modelica_model(model_path: str, model_inputs: [str], dt:float, K:int, params_as_vars=False):
     model_text = read_model(model_path)
     model_parser = ModelParser(model_text)
     model_parser.variables.inputs_are(model_inputs)
+    model_parser.variables.outputs_are_states()
 
     op = create_optimizaiton_problem_with_variables(model_parser, K, params_as_vars)
     
     model_parser.variables.convert_variables_to_symbolics()
-    op = add_odes_constraints(op, model_parser, dt)
+    op = add_odes_constraints(op, model_parser, dt, params_as_vars)
     op = add_constraint_equations(op, model_parser, params_as_vars)
     return op
 

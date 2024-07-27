@@ -15,7 +15,7 @@ class ModelEquations:
 
     def find_equation_lines(self, model_lines: [str]) -> [str]:
         start_idx = model_lines.index("equation")
-        end_idx = [line_idx for line_idx, line in enumerate(model_lines) if line[:3] == 'end'][0]
+        end_idx = [line_idx for line_idx, line in enumerate(model_lines) if line[:3] == 'end' or line[:10] == 'annotation'][0]
 
         return model_lines[start_idx+1:end_idx]
 
