@@ -7,7 +7,7 @@ from parser_common import temporary_postfix, build_expression_definitions
 def expression_to_dense_string_elements(expression: casadi.SX) -> str:
     tmp_file = '/tmp/opti_design_lib'
     with open(tmp_file,'wt') as sys.stdout:
-        expression.print_dense()
+        expression.print_dense(False)
     sys.stdout = sys.__stdout__
     with open(tmp_file, "r") as f:
         ret = f.read()
