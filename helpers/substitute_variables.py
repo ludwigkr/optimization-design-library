@@ -41,7 +41,8 @@ def substitute_variable_in_struct(exp: str, sturct_name: str, link_symbol: str, 
         if N > 1:
             for n in reversed(range(N)):
                 search_pattern = "(?!_\w+)" + var + "_" + str(n)+ "(?!_\w+)"
-                replace_pattern = replace_pattern_for_substitute_variable_in_struct(sturct_name, link_symbol, var, vars, n)
+                var_idx = vars.idxs[var][0, 0] + n
+                replace_pattern = replace_pattern_for_substitute_variable_in_struct(sturct_name, link_symbol, var, vars, var_idx)
                 exp = re.sub(search_pattern, replace_pattern, exp)
         else:
             search_pattern = "(?!_\w+)" + var + "(?!_\w+)"
