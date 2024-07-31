@@ -5,12 +5,14 @@ import casadi
 import sys
 
 sys.path.append("..")
+sys.path.append("../helpers")
 sys.path.append("../openmodelica_parser")
 
 from variables import Variables
 from optimization_problem_from_modelica_model import optimization_problem_from_modelica_model
 import optimizationconfiguration as optconfig
 import optimizationsolver
+import export_op_formulation
 
 class TestOptimizationProblemFromModelicaModel(unittest.TestCase):
     def setUp(self) -> None:
@@ -93,7 +95,7 @@ class TestOptimizationProblemFromModelicaModel(unittest.TestCase):
 
         result = optimizationsolver.run(solver, op, scenario0, prob_param0)
 
-        disp_txt = optimizationsolver.formulation(op, scenario0, prob_param0, result)
+        disp_txt = export_op_formulation.formulation(op, scenario0, prob_param0, result)
         with open('op-simple-oscilator.org', 'w') as f:
             f.write(disp_txt)
 

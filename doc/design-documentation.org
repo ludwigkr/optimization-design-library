@@ -1,0 +1,422 @@
+#+title: Developer Doc
+Initialize src blocks: Ctrl-c, Ctrl-c
+
+* ProblemBuildHelper
+
+** variable_structure_definition
+#+begin_src python
+import sys
+sys.path.append('..')
+import casadi
+import variables
+import problembuildhelper
+
+X = casadi.SX.sym("X")
+var = variables.Variables()
+var.register("X", X)
+
+helper = problembuildhelper.ProblemBuildHelper()
+
+return helper.variable_structure_definition("optimization_variable", var)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+struct optimization_variable{
+    float X;
+
+    optimization_variable(float _X):
+        X(_X){}
+
+    optimization_variable(){
+}
+    float norm() {
+        float ret = 0;
+        ret += powf(X, 2);
+        return sqrt(ret);
+    }
+};
+#+end_example
+
+** SX_sparse_str
+#+begin_src python
+import sys
+sys.path.append('..')
+import casadi
+import problembuildhelper
+
+X = casadi.SX.sym("X", 2, 2)
+X[0,0] = 1
+X[1,1] = 1
+helper = problembuildhelper.ProblemBuildHelper()
+return helper.SX_sparse_str(X)
+#+end_src
+
+#+RESULTS:
+| sparse:2-by-2,4nnz | @1=1, | (0,0)->@1 | (1,0)->X_1 | (0,1)->X_2 | (1,1)->@1 |
+
+** SX_dense_str
+
+#+begin_src python
+import sys
+sys.path.append('..')
+import casadi
+import problembuildhelper
+
+X = casadi.SX.sym("X", 2, 2)
+X[0,0] = 1
+X[1,1] = 1
+helper = problembuildhelper.ProblemBuildHelper()
+return helper.SX_dense_str(X)
+#+end_src
+
+#+RESULTS:
+| @1=1 | \n[[@1 | X_2] | \n [X_1 | @1]] |
+
+** build_matrix_definitions
+#+begin_src python
+import sys
+sys.path.append('..')
+import problembuildhelper
+
+defs = ['@1=1']
+helper = problembuildhelper.ProblemBuildHelper()
+return helper.build_matrix_definitions("name", defs)
+#+end_src
+
+#+RESULTS:
+: double name_temporary1 = 1;
+
+** build_entry_lhs
+#+begin_src python
+import sys
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+as_vector = True
+mat_size = 2
+return helper.build_entry_lhs("foo", '(1,2)', as_vector, mat_size)
+#+end_src
+
+#+RESULTS:
+: foo[5]
+
+** build_matrix_values
+#needs_debugging?
+- mat_size2 properly used?
+
+#+begin_src python
+import sys
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+vals = ['(0,0)->@1', '(1,0)->X_1', '(0,1)->X_2', '(1,1)->@1']
+as_vector = False
+mat_size2 = 100
+return helper.build_matrix_values("name", vals, as_vector, mat_size2)
+#+end_src
+
+#+RESULTS:
+: name(0,0) = name_temporary1;
+: name(1,0) = X_1;
+: name(0,1) = X_2;
+: name(1,1) = name_temporary1;
+
+** build_matrix_values_dense
+
+#todos:
+- Generates incompilable code:
+  #+begin_src cpp
+  name[0,0] = (0,0)->name_temporary1;
+  #+end_src
+
+#+begin_src python
+import sys
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+vals = ['(0,0)->@1', '(1,0)->X_1', '(0,1)->X_2', '(1,1)->@1']
+vals = ['@1', 'X_1', 'X_2', '@1']
+as_vector = False
+return helper.build_matrix_values_dense("name", vals, as_vector)
+#+end_src
+
+#+RESULTS:
+: name[0,0] = name_temporary1;
+: name[0,1] = X_1;
+: name[0,2] = X_2;
+: name[0,3] = name_temporary1;
+
+** build_vector_values
+#todos
+- the same as build_matrix_values with =as_vector = True=?
+
+#+begin_src python
+import sys
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+vals = ['(0,0)->@1', '(1,0)->X_1', '(0,1)->X_2', '(1,1)->@1']
+as_vector = False
+return helper.build_vector_values("foo", vals, as_vector)
+
+#+end_src
+
+#+RESULTS:
+: foo(0,0) = foo_temporary1;
+: foo(1,0) = X_1;
+: foo(0,1) = X_2;
+: foo(1,1) = foo_temporary1;
+
+** build_matrix
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+X = casadi.SX.sym("X", 2, 2)
+X[0,0] = 1
+X[1,1] = 1
+return helper.build_matrix("foo", X)
+#+end_src
+
+#+RESULTS:
+: double foo_temporary1 = 1;
+:     foo[0] = foo_temporary1;
+:     foo[1] = X_1;
+:     foo[2] = X_2;
+:     foo[3] = foo_temporary1;
+
+
+** substitude_variable
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+X = casadi.SX.sym("X", 2, 2)
+X[0,0] = 1
+X[1,1] = 1
+optvar_name = 'X'
+exp ='X_1 * X_0;'
+
+return helper.substitude_variable(exp, optvar_name, 'xopt', 2)
+#+end_src
+
+#+RESULTS:
+: xopt[1] * xopt[0];
+
+** replace_pattern_for_substitute_variable_in_struct
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+
+import problembuildhelper
+X = casadi.SX.sym("X")
+var = variables.Variables()
+var.register("X", X)
+
+helper = problembuildhelper.ProblemBuildHelper()
+struct_name = "prob_param"
+return helper.replace_pattern_for_substitute_variable_in_struct(struct_name, "->", "X", var, 1)
+#+end_src
+
+#+RESULTS:
+: prob_param->X[1]
+
+** substitute_variable_in_struct
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+
+import problembuildhelper
+X = casadi.SX.sym("X")
+vars = variables.Variables()
+vars.register("X", X)
+exp = "e**X"
+
+helper = problembuildhelper.ProblemBuildHelper()
+name = "prob_param"
+link_sympole = "->"
+return helper.substitute_variable_in_struct(exp, name, link_sympole, vars)
+#+end_src
+
+#+RESULTS:
+: e**prob_param->X
+
+** remove_matrix_information_lhs
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+
+import problembuildhelper
+exp = "lb[0] =e**X"
+
+helper = problembuildhelper.ProblemBuildHelper()
+return helper.remove_matrix_information_lhs(exp)
+#+end_src
+
+#+RESULTS:
+: lb = e**X
+
+** build_scalar_for_optimizer_formulation
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+import optimizationproblem
+
+import problembuildhelper
+exp = "lb[0] =e**X"
+
+helper = problembuildhelper.ProblemBuildHelper()
+op = optimizationproblem.OptimizationProblem()
+
+X = casadi.SX.sym("X")
+op.optvars.register("X", X)
+obj = 2*X
+op.register_objective(obj)
+return helper.build_scalar_for_optimizer_formulation(op, "foo", op.objective)
+#+end_src
+
+#+RESULTS:
+: foo =  (2*xopt[0]);
+
+** build_ipopt_index
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+import optimizationproblem
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+op = optimizationproblem.OptimizationProblem()
+
+X = casadi.SX.sym("X", 2, 1)
+op.optvars.register("X", X)
+obj = 2*X[0] + X[1]
+op.register_objective(obj)
+constr = X[0] * X[1]
+op.constraints.register("constr", constr)
+op.build_lagrangian()
+return helper.build_ipopt_index(op, op.lagrangian_hessian, False)
+#+end_src
+
+#+RESULTS:
+: iRow[0] = 1;
+:         jCol[0] = 0;
+:         iRow[1] = 0;
+:         jCol[1] = 1;
+
+** build_ipopt_values
+#todo: with =only-lower_triangular+matrix True= still all values are returned
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+import optimizationproblem
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+op = optimizationproblem.OptimizationProblem()
+
+X = casadi.SX.sym("X", 2, 1)
+op.optvars.register("X", X)
+obj = 2*X[0] + X[1]
+op.register_objective(obj)
+constr = X[0] * X[1]
+op.constraints.register("constr", constr)
+op.build_lagrangian()
+return helper.build_ipopt_values(op, op.lagrangian_hessian, True)
+#+end_src
+
+#+RESULTS:
+: values[0] = lamg[0];
+:         values[1] = lamg[0];
+
+** build_struct_of_variable
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+
+import problembuildhelper
+vars = variables.Variables()
+X = casadi.SX.sym("X", 2, 1)
+vars.register("X", X)
+Y = casadi.SX.sym("Y")
+vars.register("Y", Y)
+
+helper = problembuildhelper.ProblemBuildHelper()
+return helper.build_struct_of_variable("foo", vars)
+#+end_src
+
+#+RESULTS:
+: foo.X[0] = x[0];
+:     foo.X[1] = x[1];
+:     foo.Y = x[2];
+
+** build_mapper
+
+#+begin_src python
+import sys
+import casadi
+sys.path.append('..')
+import variables
+import optimizationproblem
+import problembuildhelper
+
+helper = problembuildhelper.ProblemBuildHelper()
+op = optimizationproblem.OptimizationProblem()
+
+X = casadi.SX.sym("X", 2, 1)
+op.optvars.register("X", X)
+Y = casadi.SX.sym("Y")
+op.optvars.register("Y", Y)
+obj = 2*X[0] + X[1]
+op.register_objective(obj)
+constr = X[0] * X[1]
+op.constraints.register("constr", constr)
+
+return helper.build_mappers(op)
+#+end_src
+
+#+RESULTS:
+#+begin_example
+std::tuple<std::map<std::string, size_t>, std::map<std::string, size_t>, std::map<std::string, size_t>> mappers(){
+    std::map<std::string, size_t> map_scenario;
+    std::map<std::string, size_t> map_prob_param;
+    std::map<std::string, size_t> map_xopt;
+
+
+
+    map_xopt["X"] = offsetof(optimized_variable, X);
+    map_xopt["Y"] = offsetof(optimized_variable, Y);
+
+    return std::tuple(map_scenario, map_prob_param, map_xopt);
+};
+#+end_example

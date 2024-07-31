@@ -13,7 +13,7 @@ import build_ipopt
 import optimizationconfiguration as optconfig
 import optimizationsolver
 from quadratic_optimizer_elements import QuadraticOptimizerElements
-import substitute_variables
+import testcase_exporter
 
 
 class TestHS074(unittesthelper.ParserTestCase):
@@ -40,7 +40,7 @@ class TestHS074(unittesthelper.ParserTestCase):
 
             self.assertTrue(np.linalg.norm(np.array(Xopt) - Xreal_opt) < 1e-5)
 
-            case_exporter = optimizationsolver.TestCaseExporter()
+            case_exporter = testcase_exporter.TestCaseExporter()
             case_exporter.add_case(ocp, scenario, [], result)
             case_exporter.save(self.json_file_path())
 
@@ -87,7 +87,7 @@ class TestHS074withParams(unittesthelper.ParserTestCase):
 
             self.assertTrue(np.linalg.norm(np.array(Xopt) - Xreal_opt) < 1e-5)
 
-            case_exporter = optimizationsolver.TestCaseExporter()
+            case_exporter = testcase_exporter.TestCaseExporter()
             case_exporter.add_case(self.ocp, scenario, params, result)
             case_exporter.save(self.json_file_path())
 
