@@ -47,4 +47,12 @@ jobs:
 
     - name: Run tests
       run: |
-        cd unittest && python -m unittest
+        cd unittest
+        python -m coverage run -m unittest discover
+        python -m coverage report > coverage-report.txt
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Code
+        path: unittest/coverage-report.txt
