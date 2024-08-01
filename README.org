@@ -1,6 +1,6 @@
 #+title: Optimization design library
-[[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittests-core.yml/badge.svg]]
-[[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittest-ocps.yml/badge.svg]]
+[[https://github.com/ludwigkr/optimization-design-library/actions/workflows/unittests.yml/badge.svg]]
+
 
 * Why this library?
 
