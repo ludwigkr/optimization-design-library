@@ -4,12 +4,14 @@
         "helpers",
         "unittest",
         "ipopt_builder",
-        "openmodelica_parser"
+        "openmodelica_parser",
+        "nlopt_builder"
     ],
     "python.analysis.extraPaths": [
         "helpers",
         "unittest",
         "ipopt_builder",
-        "openmodelica_parser"
+        "openmodelica_parser",
+        "nlopt_builder"
     ]
 }

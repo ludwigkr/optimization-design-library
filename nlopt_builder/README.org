@@ -1,0 +1,9 @@
+#+title: README
+
+* Design decisions
+
+Nlopt provides under other languages a C and a Cpp interface. Since this library builds for Cpp so far, we could also build for the Cpp interface of nlopt.
+However, the Cpp interface is using =std::vector= as variable interface. But =std::vector= is saving the data on the heap and not on the stack. This might unnecessary negatively influence the runtime of the optimizer (because heap memory is allocated during runtime from the OS).
+Therefore. We will build the optimizer with the C interface of nlopt and build a Cpp wrapper around the C functions.
+
+Further advantage of the implementation in C is, that it is potentially better includable in other languages (as Rust).
