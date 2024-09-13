@@ -1,2 +1,3 @@
-
 res.A(1,1) + res.B(1,1)
+float result_temporary1 = ((prob_param->aparam[0]*xi__0)+prob_param->bparam[0]);
+float result_temporary2 = ((prob_param->aparam[1]*xi__0)+prob_param->bparam[1]);

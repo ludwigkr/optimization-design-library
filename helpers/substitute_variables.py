@@ -23,15 +23,20 @@ def substitute_variable(exp: str, old_name: str, new_name: str, N: int, index_of
 
     return exp
 
-def replace_pattern_for_substitute_variable_in_struct(struct_name: str, link_symbol: str, var: str, vars: Variables, n: int)->str:
-    vars_idx = vars.idxs[var]
-    var_is_matrix = np.array(vars_idx).shape[0] > 1 and np.array(vars_idx).shape[1] > 1
+def replace_pattern_for_substitute_variable_in_struct(struct_name: str, link_symbol: str, var_name: str, vars: Variables, n: int)->str:
+    n = int(n)
+    var_idxs = vars.idxs[var_name]
+    var_is_matrix = np.array(var_idxs).shape[0] > 1 and np.array(var_idxs).shape[1] > 1
+
     if var_is_matrix:
-        var_idx = np.where(vars_idx == n)
-        var_idx = np.array(var_idx).reshape([-1]).tolist()
-        replace_pattern = f"{struct_name}{link_symbol}{var}({int(var_idx[0])},{int(var_idx[1])})"
+        var_rel_idx = np.where(var_idxs == n)
+        var_rel_idx = np.array(var_rel_idx).reshape([-1]).tolist()
+        replace_pattern = f"{struct_name}{link_symbol}{var_name}({int(var_rel_idx[0])},{int(var_rel_idx[1])})"
     else:
-        replace_pattern = struct_name + link_symbol + var + "[" + str(n) + "]"
+        var_rel_idx = np.where(var_idxs == n)
+        var_rel_idx = max(np.array(var_rel_idx).reshape([-1]).tolist())
+        replace_pattern = f"{struct_name}{link_symbol}{var_name}[{var_rel_idx}]"    
+        
     return replace_pattern
 
 
@@ -54,6 +59,7 @@ def substitute_variable_in_struct(exp: str, sturct_name: str, link_symbol: str, 
 def substitute_variables(exp: str, op: OptimizationProblem, prob_param_as_struct=False) -> str:
 
     ret = exp
+    print(f'{ret = }')
     for optvar_name in op.optvars.names:
         ret = substitute_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
 
