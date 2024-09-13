@@ -1,0 +1,1 @@
+@1=(optvector_0*optvector_1), @2=(optvector_2*optvector_1), [(-@1), (xinit-@2), @1, (@2-xinit)]

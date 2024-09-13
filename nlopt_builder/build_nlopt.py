@@ -139,7 +139,7 @@ class NloptBuilder:
 
 
     def build_objective_jacobian(self, op: OptimizationProblem) -> str:
-        ret = dense_expression_parser.parse_dense_casadi_expression('grad', op.objective_jacobian.T, one_dimensional=True)
+        ret = dense_expression_parser.parse_dense_casadi_expression('grad', op.objective_jacobian, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)
         ret = ret.replace('xopt', 'x')
         return ret
@@ -153,12 +153,12 @@ class NloptBuilder:
         # f(x) <= 0
         nlopt_constraints = casadi.SX.sym("nlopt_constraints", (0, 1))
         for i in range(lb.size()[0]):
-            if lb[i] != -math.inf:
+            if lb[i].is_symbolic() or not math.isinf(lb[i]):
                 ci = lb[i] - constraints[i]
                 nlopt_constraints = casadi.vertcat(nlopt_constraints, ci)
 
         for i in range(ub.size()[0]):
-            if ub[i] != math.inf:
+            if ub[i].is_symbolic() or not math.isinf(ub[i]):
                 ci = constraints[i] - ub[i]
                 nlopt_constraints = casadi.vertcat(nlopt_constraints, ci)
 
@@ -179,8 +179,9 @@ class NloptBuilder:
 
         optvars = op.optvars.variables_flat()
         dnlopt_constraints = casadi.jacobian(nlopt_constraints, optvars)
+        print(dnlopt_constraints)
 
-        ret = dense_expression_parser.parse_dense_casadi_expression('result', dnlopt_constraints, one_dimensional=True)
+        ret = dense_expression_parser.parse_dense_casadi_expression('grad', dnlopt_constraints, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)
         ret = ret.replace('xopt', 'x')
         return ret
@@ -201,6 +202,7 @@ class NloptBuilder:
         ret = dense_expression_parser.parse_dense_casadi_expression('result', lb, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)
         ret = ret.replace('xopt', 'x')
+        ret = ret.replace('inf', 'HUGE_VAL')
 
         return ret
 
@@ -210,5 +212,11 @@ class NloptBuilder:
         ret = dense_expression_parser.parse_dense_casadi_expression('result', ub, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)
         ret = ret.replace('xopt', 'x')
+        ret = ret.replace('inf', 'HUGE_VAL')
 
         return ret
+
+    def build_xopt_struct(self, op: OptimizationProblem):
+        xopt_flat = op.optvars.variables_flat()
+        xopt = op.optvars.pack_variables_fn()
+        pass
