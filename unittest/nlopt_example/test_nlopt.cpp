@@ -16,5 +16,6 @@ TEST(Nlopt, nlopt) {
     example_problem.prob_param->bparam << 0, 1;
     example_problem.solve();
     
+    std::cout << example_problem.xopt << std::endl;
     CHECK(true);
 };

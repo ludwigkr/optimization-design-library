@@ -121,6 +121,12 @@ class NloptBuilder:
         ubx = self.build_upper_box_boundaries(op)
         source = source.replace("    /* UBX PLACEHOLDER*/", ubx)
 
+        xopt_result = self.build_xopt_result(op)
+        source = source.replace("/* OPTIMIZED_VARIABLE PLACEHOLDER*/", xopt_result)
+
+        osstreams = cpp_optimizer_helper.build_osstreams(op)
+        source = source.replace("/* OS STREAM PLACEHOLDER*/", osstreams)
+
         if path is None:
             file_path = './' + op.name + "_formulation.cpp"
         else:
@@ -216,7 +222,19 @@ class NloptBuilder:
 
         return ret
 
-    def build_xopt_struct(self, op: OptimizationProblem):
+    def build_xopt_result(self, op: OptimizationProblem):
         xopt_flat = op.optvars.variables_flat()
         xopt = op.optvars.pack_variables_fn()
-        pass
+        ret = ""
+        
+        for xopti_name in op.optvars.names:
+            xopti_idx = op.optvars.idxs[xopti_name]
+            if len(xopti_idx) == 1:
+                ret += f"xopt->{xopti_name} = x[{xopti_idx[0][0]}];\n"
+            else:
+                xopti_idx = xopti_idx.T.reshape([-1]).tolist()
+                values = [f'x[{idx}]' for idx in xopti_idx]
+                values = ",".join(values)
+                ret += f"xopt->{xopti_name} << {values};\n"
+
+        return ret

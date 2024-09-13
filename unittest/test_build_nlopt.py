@@ -24,14 +24,13 @@ class TestNloptBuilderCore(unittesthelper.ParserTestCase):
         self.builder = build_nlopt.NloptBuilder()
         return super().setUp()
 
-    @unittest.skip("not ready yet")
-    def test_build_xopt_struct(self):
+    def test_build_xopt_result(self):
         ocp = build_nlopt.OptimizationProblem()
         ocp.optvars.register('number_a')
         ocp.optvars.register('vector_b', 5)
-        ocp.optvars.register('matrix_C', [2, 2])
+        ocp.optvars.register('matrix_C', [3, 2])
 
-        result = self.builder.build_xopt_struct(ocp)
+        result = self.builder.build_xopt_result(ocp)
         
         reference = self.load_reference()
         self.save_reference(result)

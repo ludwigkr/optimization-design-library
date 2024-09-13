@@ -22,4 +22,9 @@ void constraint_fn(unsigned m, double *result, unsigned n, const double *x, doub
 void initial_guess_fn(double *result, unsigned n, const double *x, void *f_data);
 void lower_bound_fn(double *result, unsigned n, const double *x, void *f_data);
 void upper_bound_fn(double *result, unsigned n, const double *x, void *f_data);
+void optimized_variable_fn(optimized_variable *xopt, unsigned n, const double *x);
 double sq(double var_in);
+
+std::ostream &operator<<(std::ostream &os, const scenario_parameter &s);
+std::ostream &operator<<(std::ostream &os, const problem_parameter &p);
+std::ostream &operator<<(std::ostream &os, const optimized_variable &o);

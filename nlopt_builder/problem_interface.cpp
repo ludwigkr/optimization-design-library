@@ -26,5 +26,7 @@ int Problem::solve() {
     double minf;
     auto status = nlopt_optimize(optimizer, x, &minf);
 
+    optimized_variable_fn(&xopt, N_XOPTS, x);
+
     return status;
 }

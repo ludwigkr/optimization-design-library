@@ -71,7 +71,14 @@ void upper_bound_fn(double *result, unsigned n, const double *x, void *f_data) {
     /* UBX PLACEHOLDER*/
 }
 
+void optimized_variable_fn(optimized_variable *xopt, unsigned n, const double *x) {
+
+    /* OPTIMIZED_VARIABLE PLACEHOLDER*/
+
+}
 
 double sq(double var_in) {
     return pow(var_in, 2);
 }
+
+/* OS STREAM PLACEHOLDER*/
