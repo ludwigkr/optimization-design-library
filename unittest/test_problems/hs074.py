@@ -7,20 +7,21 @@ import sys
 sys.path.append(f"{modulepath}/../..")
 from optimizationproblem import OptimizationProblem
 
+
 def hs074_problem():
     ocp = OptimizationProblem()
     ocp.name = 'hs074'
 
-    x = ocp.optvars.register("xi", [2,2])
+    x = ocp.optvars.register("xi", [2, 2])
 
     # objective = x[0]*x[3]*(x[0]+x[1]+x[2])+x[2]
-    objective = x[0,0]*x[1,1]*(x[0,0]+x[1,0]+x[0,1])+x[0,1]
+    objective = x[0, 0]*x[1, 1] * (x[0, 0]+x[1, 0]+x[0, 1]) + x[0, 1]
     ocp.register_objective(objective)
 
-    c1 = x[0,0]*x[1,0]*x[0,1]*x[1,1]
+    c1 = x[0, 0]*x[1, 0]*x[0, 1]*x[1, 1]
     ocp.constraints.register("c1", c1)
 
-    c2 = x[0,0]**2 + x[1,0]**2 + x[0,1]**2 + x[1,1]**2
+    c2 = x[0, 0]**2 + x[1, 0]**2 + x[0, 1]**2 + x[1, 1]**2
     ocp.constraints.register("c2", c2)
 
     return ocp
