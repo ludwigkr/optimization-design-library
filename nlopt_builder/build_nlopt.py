@@ -45,7 +45,6 @@ class NloptBuilder:
         with open(str(local_folder_path) + '/problem_interface.hpp', 'r') as f:
             header = f.read()
 
-        header = header.replace('nxopts', str(op.optvars.n_vars))
         header = header.replace('problem_formulation', op.name + '_formulation')
         header = header.replace('Problem', self.classname)
 
@@ -79,6 +78,10 @@ class NloptBuilder:
     def build_formulation_header(self, op: OptimizationProblem, path: str) -> None:
         with open(str(local_folder_path) + '/problem_formulation.hpp', 'r') as f:
             header = f.read()
+
+        header = header.replace('nxopts', str(op.optvars.n_vars))
+        nlopt_constraints = self.build_nlopt_constraints(op)
+        header = header.replace('nconstraints', str(nlopt_constraints.size1()))
 
         header = header.replace("struct scenario_parameter;", cpp_struct_definition.cpp_struct_definition("scenario_parameter", op.scenario_parameters))
         header = header.replace("struct problem_parameter;", cpp_struct_definition.cpp_struct_definition("problem_parameter", op.problem_parameters))
@@ -172,7 +175,6 @@ class NloptBuilder:
 
     def build_constraints(self, op: OptimizationProblem) -> str:
         nlopt_constraints = self.build_nlopt_constraints(op)
-        print(f"{nlopt_constraints = }")
 
         ret = dense_expression_parser.parse_dense_casadi_expression('result', nlopt_constraints, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)
@@ -185,7 +187,6 @@ class NloptBuilder:
 
         optvars = op.optvars.variables_flat()
         dnlopt_constraints = casadi.jacobian(nlopt_constraints, optvars)
-        print(dnlopt_constraints)
 
         ret = dense_expression_parser.parse_dense_casadi_expression('grad', dnlopt_constraints, one_dimensional=True)
         ret = substitute_variables.substitute_variables(ret, op, True)

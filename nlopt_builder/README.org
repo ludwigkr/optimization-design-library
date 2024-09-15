@@ -1,6 +1,10 @@
 #+title: README
 
-* Design decisions
+* About NLOPT
+
+Nlopt, doesn't have feasible finding method for the initial guess. So you, the user, must provide a feasible initial guess for the nlopt algorithms.
+
+* Builder Design decisions
 
 Nlopt provides under other languages a C and a Cpp interface. Since this library builds for Cpp so far, we could also build for the Cpp interface of nlopt.
 However, the Cpp interface is using =std::vector= as variable interface. But =std::vector= is saving the data on the heap and not on the stack. This might unnecessary negatively influence the runtime of the optimizer (because heap memory is allocated during runtime from the OS).

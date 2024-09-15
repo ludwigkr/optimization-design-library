@@ -82,3 +82,8 @@ double sq(double var_in) {
 }
 
 /* OS STREAM PLACEHOLDER*/
+
+std::ostream &operator<<(std::ostream &os, const optimizer_info &o) {
+    return os << "{ costs: " << o.costs << ", active_box_limits: " << o.active_box_limits.transpose() << ", active_constraints: " << o.active_constraints.transpose()
+           << ", violated_active_box_limits: " << o.violated_box_limits.transpose() << ", violated_constraints: " << o.violated_constraints.transpose() << " }";
+};

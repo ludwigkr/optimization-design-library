@@ -3,7 +3,6 @@
 #include <nlopt.h>
 #include "problem_formulation.hpp"
 
-#define N_XOPTS nxopts
 
 class Problem {
 public:
@@ -11,6 +10,7 @@ public:
     scenario_parameter *scenario;
     problem_parameter *prob_param;
     optimized_variable xopt;
+    optimizer_info opt_info;
     int solve();
     void init(nlopt_algorithm algorythm);
     Problem() {

@@ -28,5 +28,39 @@ int Problem::solve() {
 
     optimized_variable_fn(&xopt, N_XOPTS, x);
 
+    opt_info.costs = minf;
+    for (uint i = 0; i < N_XOPTS; i++) {
+        if (abs(x[i] - lbx[i]) < 1e-3) {
+            opt_info.active_box_limits[i] = true;
+        } else if (abs(x[i] - ubx[i]) < 1e-3) {
+            opt_info.active_box_limits[i] = true;
+        } else {
+            opt_info.active_box_limits[i] = false;
+        }
+
+        if ((lbx[i] - x[i] > 1e-4) || (x[i] - ubx[i] > 1e-4)) {
+            opt_info.violated_box_limits[i] = true;
+        } else {
+            opt_info.violated_box_limits[i] = false;
+        }
+
+    }
+
+    double constraint_values[N_CONSTRAINTS] = {0};
+    constraint_fn(N_CONSTRAINTS, constraint_values, N_XOPTS, x, NULL, static_cast<void *>(&prob_data));
+    for (uint i = 0; i < N_CONSTRAINTS; i++) {
+        if (abs(constraint_values[i]) < 1e-3) {
+            opt_info.active_constraints[i] = true;
+        } else {
+            opt_info.active_constraints[i] = false;
+        }
+
+        if (constraint_values[i] > 1e-4) {
+            opt_info.violated_constraints[i] = true;
+        } else {
+            opt_info.violated_constraints[i] = false;
+        }
+    }
+
     return status;
 }
