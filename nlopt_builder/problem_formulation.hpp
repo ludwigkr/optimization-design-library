@@ -1,4 +1,5 @@
 #pragma once
+#include <nlopt.h>
 #include <math.h>
 #include <eigen3/Eigen/Core>
 
@@ -10,6 +11,7 @@ struct problem_parameter;
 struct optimized_variable;
 
 struct optimizer_info {
+    nlopt_result status;
     double costs;
     Eigen::VectorXd lagrangian;
     Eigen::VectorXi active_constraints;

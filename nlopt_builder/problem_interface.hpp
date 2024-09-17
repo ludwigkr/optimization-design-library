@@ -1,6 +1,5 @@
 #pragma once
 #include <math.h>
-#include <nlopt.h>
 #include "problem_formulation.hpp"
 
 
@@ -23,11 +22,12 @@ public:
 
 private:
 
+    double minf;
     double lbx[N_XOPTS];
     double ubx[N_XOPTS];
     double x[N_XOPTS];
     nlopt_opt optimizer;
-    double objective(unsigned n, const double *x, double *grad, void *my_func_data);
     const double tolerance = 1e-8;
 
+    void eval_optimizer_result(nlopt_result status);
 };

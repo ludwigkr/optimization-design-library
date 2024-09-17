@@ -23,12 +23,17 @@ int Problem::solve() {
 
 
     initial_guess_fn(x, N_XOPTS, x, static_cast<void *>(&prob_data));
-    double minf;
-    auto status = nlopt_optimize(optimizer, x, &minf);
+    nlopt_result status = nlopt_optimize(optimizer, x, &minf);
 
     optimized_variable_fn(&xopt, N_XOPTS, x);
+    eval_optimizer_result(status);
 
+    return status;
+}
+
+void Problem::eval_optimizer_result(nlopt_result status) {
     opt_info.costs = minf;
+    opt_info.status = status;
     for (uint i = 0; i < N_XOPTS; i++) {
         if (abs(x[i] - lbx[i]) < 1e-3) {
             opt_info.active_box_limits[i] = true;
@@ -62,5 +67,4 @@ int Problem::solve() {
         }
     }
 
-    return status;
 }

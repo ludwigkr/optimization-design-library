@@ -17,5 +17,6 @@ TEST(Nlopt, nlopt) {
     example_problem.solve();
     
     std::cout << example_problem.xopt << std::endl;
+    std::cout << example_problem.opt_info << std::endl;
     CHECK(true);
 };
