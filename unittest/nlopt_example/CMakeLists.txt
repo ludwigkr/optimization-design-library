@@ -21,9 +21,14 @@ pkg_check_modules(EIGEN3 REQUIRED eigen3)
 
 set(SRC_DIR ./)
 set(UNITTEST_DIR ./)
+
 include_directories(${SRC_DIR})
 include_directories( ${EIGEN3_INCLUDE_DIRS} )
 
+set(SOURCE_FILES_MAIN
+    ${SRC_DIR}/main.cpp
+    ${SRC_DIR}/nlopt_example_interface.cpp
+    ${SRC_DIR}/nlopt_example_formulation.cpp)
 
 set(SOURCE_FILES_UNITTEST
     ${UNITTEST_DIR}/test_main.cpp
@@ -31,7 +36,8 @@ set(SOURCE_FILES_UNITTEST
     ${SRC_DIR}/nlopt_example_interface.cpp
     ${SRC_DIR}/nlopt_example_formulation.cpp)
 
-# add_executable(${PROJECT_NAME} ${SOURCE_FILES_PROGRAM})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES_MAIN})
+target_link_libraries(${PROJECT_NAME} nlopt)
 
 add_executable(test_${PROJECT_NAME} ${SOURCE_FILES_UNITTEST})
 target_link_libraries(test_${PROJECT_NAME} nlopt)
