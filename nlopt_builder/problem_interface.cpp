@@ -16,13 +16,12 @@ int Problem::solve() {
     upper_bound_fn(ubx, N_XOPTS, x, static_cast<void *>(&prob_data));
     nlopt_set_upper_bounds(optimizer, ubx);
 
-    nlopt_set_min_objective(optimizer, objective_fn, NULL);
+    nlopt_set_min_objective(optimizer, objective_fn, static_cast<void *>(&prob_data));
     nlopt_add_inequality_mconstraint(optimizer, N_XOPTS, constraint_fn, static_cast<void *>(&prob_data), &tolerance);
 
     nlopt_set_xtol_rel(optimizer, tolerance);
-
-
     initial_guess_fn(x, N_XOPTS, x, static_cast<void *>(&prob_data));
+
     nlopt_result status = nlopt_optimize(optimizer, x, &minf);
 
     optimized_variable_fn(&xopt, N_XOPTS, x);

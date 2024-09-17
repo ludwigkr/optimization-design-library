@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_nlopt-template",
+            "program": "${workspaceFolder}/build/nlopt-template",
             "args": [ ],
             "stopAtEntry": false,
             "preLaunchTask": "make",

@@ -6,15 +6,15 @@
 class Problem {
 public:
     problem_data prob_data;
-    scenario_parameter *scenario;
-    problem_parameter *prob_param;
+    scenario_parameter scenario;
+    problem_parameter prob_param;
     optimized_variable xopt;
     optimizer_info opt_info;
     int solve();
     void init(nlopt_algorithm algorythm);
     Problem() {
-        scenario = &(prob_data.scenario);
-        prob_param = &(prob_data.prob_param);
+        prob_data.scenario = &scenario;
+        prob_data.prob_param = &prob_param;
     }
     ~Problem() {
         nlopt_destroy(optimizer);

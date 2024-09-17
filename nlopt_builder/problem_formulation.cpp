@@ -13,8 +13,8 @@
 double objective_fn(unsigned n, const double *x, double *grad, void *f_data) {
 
     struct problem_data *problem_data = static_cast<struct problem_data *>(f_data);
-    struct scenario_parameter *scenario = &(problem_data->scenario);
-    struct problem_parameter *prob_param = &(problem_data->prob_param);
+    struct scenario_parameter *scenario = problem_data->scenario;
+    struct problem_parameter *prob_param = problem_data->prob_param;
 
     if (grad) {
         /* OBJECTIVE_JACOBIAN PLACEHOLDER*/
@@ -34,8 +34,8 @@ double objective_fn(unsigned n, const double *x, double *grad, void *f_data) {
  **/
 void constraint_fn(unsigned m, double *result, unsigned n, const double *x, double *grad, void *f_data) {
     struct problem_data *problem_data = static_cast<struct problem_data *>(f_data);
-    struct scenario_parameter *scenario = &(problem_data->scenario);
-    struct problem_parameter *prob_param = &(problem_data->prob_param);
+    struct scenario_parameter *scenario = problem_data->scenario;
+    struct problem_parameter *prob_param = problem_data->prob_param;
 
     /** f(x) <= 0 */
     /* CONSTRAINTS PLACEHOLDER*/
@@ -48,24 +48,24 @@ void constraint_fn(unsigned m, double *result, unsigned n, const double *x, doub
 
 void initial_guess_fn(double *result, unsigned n, const double *x, void *f_data) {
     struct problem_data *problem_data = static_cast<struct problem_data *>(f_data);
-    struct scenario_parameter *scenario = &(problem_data->scenario);
-    struct problem_parameter *prob_param = &(problem_data->prob_param);
+    struct scenario_parameter *scenario = problem_data->scenario;
+    struct problem_parameter *prob_param = problem_data->prob_param;
 
     /* INITIAL_GUESS PLACEHOLDER*/
 }
 
 void lower_bound_fn(double *result, unsigned n, const double *x, void *f_data) {
     struct problem_data *problem_data = static_cast<struct problem_data *>(f_data);
-    struct scenario_parameter *scenario = &(problem_data->scenario);
-    struct problem_parameter *prob_param = &(problem_data->prob_param);
+    struct scenario_parameter *scenario = problem_data->scenario;
+    struct problem_parameter *prob_param = problem_data->prob_param;
 
     /* LBX PLACEHOLDER*/
 }
 
 void upper_bound_fn(double *result, unsigned n, const double *x, void *f_data) {
     struct problem_data *problem_data = static_cast<struct problem_data *>(f_data);
-    struct scenario_parameter *scenario = &(problem_data->scenario);
-    struct problem_parameter *prob_param = &(problem_data->prob_param);
+    struct scenario_parameter *scenario = problem_data->scenario;
+    struct problem_parameter *prob_param = problem_data->prob_param;
 
 
     /* UBX PLACEHOLDER*/

@@ -29,13 +29,8 @@ struct optimizer_info {
 };
 
 struct problem_data {
-    struct scenario_parameter scenario;
-    struct problem_parameter prob_param;
-
-    problem_data() {
-        scenario = scenario_parameter();
-        prob_param = problem_parameter();
-    }
+    struct scenario_parameter *scenario;
+    struct problem_parameter *prob_param;
 };
 
 double objective_fn(unsigned n, const double *x, double *grad, void *f_data);
