@@ -35,6 +35,7 @@ jobs:
       run: |
         sudo apt-get install coinor-libipopt-dev -y
         sudo apt-get install cpputest -y
+        sudo apt-get install libnlopt-dev -y
 
         git submodule update --init --recursive
 
