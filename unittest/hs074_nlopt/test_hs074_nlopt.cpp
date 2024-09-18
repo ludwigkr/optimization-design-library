@@ -15,7 +15,7 @@ TEST(Nlopt, nlopt) {
     xtarget << 1, 3.82115, 4.743, 1.37941;
     Eigen::MatrixXd mat(2, 2);
     mat << 1, 5, 5, 1;
-    hs074.prob_data.scenario.X_guess = mat;
+    hs074.scenario.X_guess = mat;
 
     auto status = hs074.solve();
     std::cout << "Status: " << status << std::endl;

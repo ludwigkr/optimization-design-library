@@ -59,7 +59,6 @@ def substitute_variable_in_struct(exp: str, sturct_name: str, link_symbol: str, 
 def substitute_variables(exp: str, op: OptimizationProblem, prob_param_as_struct=False) -> str:
 
     ret = exp
-    print(f'{ret = }')
     for optvar_name in op.optvars.names:
         ret = substitute_variable(ret, optvar_name, 'xopt', op.optvars.idxs[optvar_name].size, op.optvars.idxs[optvar_name][0,0])
 
