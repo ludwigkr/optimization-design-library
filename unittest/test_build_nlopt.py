@@ -97,6 +97,7 @@ class TestNloptExample(unittesthelper.ParserTestCase):
         pipe = os.popen("cd nlopt_example && mkdir -p build && cd build && cmake .. && make -j4 && ./test_nlopt-template")
         result = pipe.read()
         pipe.close()
+        print(f"Debug: {result = }")
         last_line = result.replace("\n\n", "\n").split("\n")[-2]
         result = last_line.split(' ')[0]
         self.assertTrue(result == "OK")
@@ -115,6 +116,8 @@ class TestHS074(unittesthelper.ParserTestCase):
             pipe = os.popen("cd hs074_nlopt && mkdir -p build && cd build && cmake .. && make -j4 && ./test_hs074-nlopt")
             result = pipe.read()
             pipe.close()
+
+            print(f"Debug: {result = }")
             last_line = result.replace("\n\n", "\n").split("\n")[-2]
             result = last_line.split(' ')[0]
             self.assertTrue(result == "OK")
