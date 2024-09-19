@@ -94,7 +94,7 @@ class TestNloptExample(unittesthelper.ParserTestCase):
         ocp = nlopt_example.nlopt_example_problem()
         ocp = nlopt_example.add_nlopt_example_build_functions(ocp)
         self.builder.build(ocp, "./nlopt_example")
-        pipe = os.popen("cd nlopt_example && mkdir -p build && cd build && cmake .. && make -j4 && ./test_nlopt-template")
+        pipe = os.popen("cd nlopt_example && mkdir -p build && cd build && cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON && make -j4 && ./test_nlopt-template")
         result = pipe.read()
         pipe.close()
         print(f"Debug: {result = }")
@@ -113,7 +113,7 @@ class TestHS074(unittesthelper.ParserTestCase):
 
         with self.subTest("build"):
             self.builder.build(ocp, "./hs074_nlopt")
-            pipe = os.popen("cd hs074_nlopt && mkdir -p build && cd build && cmake .. && make -j4 && ./test_hs074-nlopt")
+            pipe = os.popen("cd hs074_nlopt && mkdir -p build && cd build && cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON && make -j4 && ./test_hs074-nlopt")
             result = pipe.read()
             pipe.close()
 
