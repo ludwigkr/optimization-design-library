@@ -11,7 +11,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(PkgConfig REQUIRED)
-find_package(CppUTest REQUIRED)
 find_package(NLopt REQUIRED)
 message(STATUS "Nlopt_FOUND: ${NLOPT_FOUND}")
 message(STATUS "Nlopt_INCLUDE_DIRS: ${NLOPT_INCLUDE_DIRS}")
