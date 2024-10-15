@@ -71,6 +71,9 @@ class OptimizationProblem:
         """
         V is the variable which can be positive and negative.
         E is the variable wich only can be positive.
+        E - V >= 0
+        E + V >= 0
+        E >= 0
         """
         assert(V.size() == E.size())
         constraints = casadi.SX.zeros(V.size1(), 2 * V.size2())
